@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+    <div>
+
+        <h3>POSTS</h3>
+        <a href = "/">home</a>
+        <br><br>
+
+        <table>
+            <tr>
+                <th>{{ thread['title'] }}</th>
+            </tr>
+            {% for post in thread['thread'] %}
+                <tr>
+                    <td>{{ post['message'] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <form actions="/reply/{{ thread['_id'] }}" method="POST">
+            <label>Message: </label><input type = "text" name = "message" id = "message"><br>
+            <input type = "submit" value="Add">
+        </form> 
+    </div>
+    
+{% endblock %}

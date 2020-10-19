@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+    <div>
+
+        <h3>THREADS</h3>
+        <br><br>
+
+        {% if threads|length < 1 %}
+        <h4>There are no threads</h4>
+        {% else %}
+        <table>
+            <tr>
+                <th>POSTED</th>
+                <th>THREAD</th>
+                <th>REPLIES</th>
+                <th>LAST UPDATED</th>
+                <th>ACTIONS</th>
+            </tr>
+            {% for thread in threads %}
+                <tr>
+                    <td>{{ thread['formattedDate'] }}</td>
+                    <td><a href="/t/{{thread['_id']}}">{{ thread['title'] }}</a></td>
+                    <td>{{ thread['posts'] }}</td>
+                    <td>{{ thread['formattedLastUpdated'] }}</td>
+                    <td><a href="/delete/{{thread['_id']}}">Delete</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        <br>
+        <form actions="/" method="POST">
+            <label>Subject: </label><input type = "text" name = "title" id = "title"><br>
+            <label>Post:    </label><input type = "text" name = "post" id = "post"><br>
+            <input type = "submit" value="Add">
+        </form> 
+    </div>
+    
+{% endblock %}
