@@ -8,19 +8,24 @@
     <div>
 
         <h3>POSTS</h3>
-        <a href = "/">home</a>
-        <br><br>
-
-        <table>
-            <tr>
-                <th>{{ thread['title'] }}</th>
-            </tr>
+        <div class='path'><a href = "/">Home</a> > /t/{{ thread['_id'] }}</div>
+        <br>
             {% for post in thread['thread'] %}
-                <tr>
-                    <td>{{ post['message'] }}</td>
-                </tr>
+
+                <div class="wrapper">
+                    <div class="post_info">
+                    UserID: <b class='userid' style="background-color:{{ post['idColor'] }}">{{ post['user'] }}</b> <b>·</b> Posted: <b>{{ post['formattedPosted'] }}</b>
+                    </div>
+                    <div class="post">
+                        {% if post['postNum'] == 1 %}
+                        <div class="title">{{ thread['title'] }}</div>
+                        {% else %}
+                        {% endif %}
+                        {{ post['message'] }}
+                    </div>
+                </div>
+
             {% endfor %}
-        </table>
 
         <br>
         <form actions="/reply/{{ thread['_id'] }}" method="POST">

@@ -11,8 +11,9 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
 import hashlib
+import random
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="./static/")
 app.config['MONGO_DBNAME'] = 'stall'
 app.config["MONGO_URI"] = 'mongodb://stallapp:stall123@cluster0-shard-00-00.bjwrh.mongodb.net:27017,cluster0-shard-00-01.bjwrh.mongodb.net:27017,cluster0-shard-00-02.bjwrh.mongodb.net:27017/stall?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority'
 mongo = PyMongo(app)
@@ -32,11 +33,13 @@ def index():
                 'date':datetime.now(),  
                 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                 'lastUpdated':datetime.now(), 'posts':1, 
-                'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP' }] ,
+                'threadUsers':[ { 'ip':'', 'userID':'OP', 'idColor':'#ffffff'  } ], #temporarily removing the first-post OP code so that I can see user ID generation
                 'thread':[ { 
                     'message':request.form['post'], 
-                    'posted':datetime.now(), 
-                    'postNum':1, 'user':'OP', 
+                    'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
+                    'postNum':1, 
+                    'user':'OP', 
+                    'idColor':'#ffffff',
                     'userIP':request.remote_addr, 
                     'replies':[] 
                 } ]
@@ -76,23 +79,27 @@ def t(id):
         
         # this checks to see if the ip address has posted previously.  If not, a new user ID will be generated and stored
         if mongo.db.threads.find({'_id':ObjectId(id), 'threadUsers.ip':ip_address}).count() == 0:
+            color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
             m = hashlib.md5()
             m.update(str(str(thread['_id']) + ip_address).encode('utf-8'))
             userid = str(m.hexdigest())[0:10]
-            mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid}}})
+            mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid, 'idColor':color}}})
         # if the ip address was used before, this next block finds the corresponding user ID so it can be attached to the post
         else:
             for user in thread['threadUsers']:
                 if user['ip'] == ip_address:
                     userid = user['userID']
+                    color = user['idColor']
 
         # the post and all its corresponding information is posted to the thread
         thread_update = { '$push':
                             { 'thread':
                                 { 'message':request.form['message'], 
-                                'posted':datetime.now(), 
+                                'posted':datetime.now(),
+                                'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
                                 'postNum':new_post_count, 
                                 'user':userid, 
+                                'idColor':color,
                                 'userIP':ip_address, 
                                 'replies':[] 
                                 }
@@ -131,6 +138,7 @@ def boardIndex(keyword):
                 'thread':[ { 
                     'message':request.form['post'], 
                     'posted':datetime.now(), 
+                    'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                     'postNum':1, 'user':'OP', 
                     'userIP':request.remote_addr, 
                     'replies':[] 
@@ -185,6 +193,7 @@ def boardT(keyword, id):
                             { 'thread':
                                 { 'message':request.form['message'], 
                                 'posted':datetime.now(), 
+                                'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                                 'postNum':new_post_count, 
                                 'user':userid, 
                                 'userIP':ip_address, 
