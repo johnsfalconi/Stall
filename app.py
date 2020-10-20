@@ -14,8 +14,8 @@ import hashlib
 import random
 
 app = Flask(__name__, static_folder="./static/")
-app.config['MONGO_DBNAME'] = 'stall'
-app.config["MONGO_URI"] = 'mongodb://stallapp:stall123@cluster0-shard-00-00.bjwrh.mongodb.net:27017,cluster0-shard-00-01.bjwrh.mongodb.net:27017,cluster0-shard-00-02.bjwrh.mongodb.net:27017/stall?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority'
+app.config['MONGO_DBNAME'] = ''
+app.config["MONGO_URI"] = ''
 mongo = PyMongo(app)
 
 def __repr__(self):
