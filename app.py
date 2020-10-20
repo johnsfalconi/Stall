@@ -13,9 +13,15 @@ from datetime import datetime
 import hashlib
 import random
 
+<<<<<<< HEAD
 app = Flask(__name__, static_folder="./static/")
 app.config['MONGO_DBNAME'] = ''
 app.config["MONGO_URI"] = ''
+=======
+app = Flask(__name__)
+app.config['MONGO_DBNAME'] = # dbname here
+app.config["MONGO_URI"] = # uri here
+>>>>>>> 468d136a7295a2c2c9960c3bcbb0aeafdea16a9c
 mongo = PyMongo(app)
 
 def __repr__(self):
