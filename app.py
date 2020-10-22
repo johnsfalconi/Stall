@@ -12,10 +12,15 @@ from bson.objectid import ObjectId
 from datetime import datetime
 import hashlib
 import random
+import os
+from dotenv import load_dotenv
+
+# load .env file
+load_dotenv()
 
 app = Flask(__name__, static_folder="./static/")
-app.config['MONGO_DBNAME'] = ''
-app.config["MONGO_URI"] = ''
+app.config['MONGO_DBNAME'] = os.environ.get("MONGO_DBNAME") or os.getenv("MONGO_DBNAME")
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI") or os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
 def __repr__(self):
