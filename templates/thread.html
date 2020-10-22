@@ -14,17 +14,39 @@
 
                 <div class="wrapper">
                     <div class="post_info">
-                    UserID: <b class='userid' style="background-color:{{ post['idColor'] }}">{{ post['user'] }}</b> <b>·</b> Posted: <b>{{ post['formattedPosted'] }}</b>
+                    UserID: <b style="background-color:{{ post['idColor'] }}; color:darkred; border-radius: 2px;" onmouseenter="this.style.backgroundColor='black'; this.style.color='white'" onmouseleave="this.style.backgroundColor='{{ post['idColor'] }}'; this.style.color='darkred'">{{ post['user'] }}</b> <b>·</b> Posted: <b style='color:darkred;'>{{ post['formattedPosted'] }}</b>
                     </div>
                     <div class="post">
                         {% if post['postNum'] == 1 %}
                         <div class="title">{{ thread['title'] }}</div>
                         {% else %}
                         {% endif %}
-                        {{ post['message'] }}
+                        {% for p in post['message'].split('\n') %}
+                            {% if p[0] == '>' %}
+                                <p style = "margin:0; color:rgb(182, 231, 66)">{{ p }}</p>
+                            {% else %}
+                                <p style = "margin:0">{{ p }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    <div class="quotebox" id="quote{{ post['postNum'] }}">
+                            <form actions="/reply/{{ thread['_id'] }}" method="POST">
+                                <textarea type = "text" name = "message" id = "message">/{{ post['postNum'] }}{% for p in post['message'].split('\n') %}
+>{{ p }}{% endfor %}
+</textarea><br>
+                                <input type = "submit" formaction="/t/{{ thread['_id'] }}" value = "Add"> <a href="/t/{{ thread['_id'] }}">Cancel</a>
+                            </form>
+                    </div>
+                    <div class="replybox" id="reply{{ post['postNum'] }}">
+                        <form actions="/reply/{{ thread['_id'] }}" method="POST">
+                            <textarea type = "text" name = "message" id = "message">/{{ post['postNum'] }}
+</textarea><br>
+                            <input type = "submit" formaction="/t/{{ thread['_id'] }}" value = "Add"> <a href="/t/{{ thread['_id'] }}">Cancel</a>
+                        </form>
+                    </div>
+                    <br><br>
+                        <div class="quote_reply"> {{ post['postNum'] }} · <a id="reply" href="#reply{{ post['postNum'] }}">[Reply]</a> · <a id="quote" href="#quote{{ post['postNum'] }}">[Quote]</a></div>
                     </div>
                 </div>
-
             {% endfor %}
 
         <br>

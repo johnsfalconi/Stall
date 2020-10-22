@@ -13,15 +13,9 @@ from datetime import datetime
 import hashlib
 import random
 
-<<<<<<< HEAD
 app = Flask(__name__, static_folder="./static/")
-app.config['MONGO_DBNAME'] = ''
-app.config["MONGO_URI"] = ''
-=======
-app = Flask(__name__)
-app.config['MONGO_DBNAME'] = # dbname here
-app.config["MONGO_URI"] = # uri here
->>>>>>> 468d136a7295a2c2c9960c3bcbb0aeafdea16a9c
+app.config['MONGO_DBNAME'] = 'stall'
+app.config["MONGO_URI"] = 'mongodb://stallapp:stall123@cluster0-shard-00-00.bjwrh.mongodb.net:27017,cluster0-shard-00-01.bjwrh.mongodb.net:27017,cluster0-shard-00-02.bjwrh.mongodb.net:27017/stall?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority'
 mongo = PyMongo(app)
 
 def __repr__(self):
@@ -30,8 +24,10 @@ def __repr__(self):
 # Thread creation and index page generation with the list of threads.
 @app.route("/", methods = ['POST', 'GET'])
 def index():
+
     if request.method == 'POST':
         try:
+            # this is all stored as a variable so it can be laid out for readability
             new_thread = {
                 'title':str(request.form['title']), 
                 'board':'Global', 
@@ -39,7 +35,7 @@ def index():
                 'date':datetime.now(),  
                 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                 'lastUpdated':datetime.now(), 'posts':1, 
-                'threadUsers':[ { 'ip':'', 'userID':'OP', 'idColor':'#ffffff'  } ], #temporarily removing the first-post OP code so that I can see user ID generation
+                'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
                 'thread':[ { 
                     'message':request.form['post'], 
                     'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
@@ -50,9 +46,12 @@ def index():
                     'replies':[] 
                 } ]
             }
+            # the actual insert_one statement saved to a variable so the new document's _id can be referenced
             x = mongo.db.threads.insert_one(new_thread)
             
+            #redirect using the thread app route to bring the user to the newly-inserted thread
             return redirect('/t/' + str(x.inserted_id))
+
         except:
             return 'There was an issue adding'
     else:
@@ -120,7 +119,7 @@ def t(id):
         
         # the thread is then refreshed
         try:
-            return redirect(url)
+            return redirect('/t/' + str(thread['_id']))
         except:
             return 'thread does not exist'
     else:
@@ -140,12 +139,13 @@ def boardIndex(keyword):
                 'date':datetime.now(),  
                 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                 'lastUpdated':datetime.now(), 'posts':1, 
-                'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP' }] ,
+                'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
                 'thread':[ { 
                     'message':request.form['post'], 
-                    'posted':datetime.now(), 
                     'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
-                    'postNum':1, 'user':'OP', 
+                    'postNum':1, 
+                    'user':'OP', 
+                    'idColor':'#ffffff',
                     'userIP':request.remote_addr, 
                     'replies':[] 
                 } ]
@@ -156,8 +156,11 @@ def boardIndex(keyword):
         except:
             return 'There was an issue adding'
     else:
-        threads = list(mongo.db.threads.find({'board':keyword}))
-        return render_template('board.html', threads = threads, keyword = keyword)
+        if keyword == 't':
+            return 'Invalid board name'
+        else:
+            threads = list(mongo.db.threads.find({'board':keyword}))
+            return render_template('board.html', threads = threads, keyword = keyword)
 
 
 @app.route('/<keyword>/delete/<id>')
@@ -184,6 +187,7 @@ def boardT(keyword, id):
         
         # this checks to see if the ip address has posted previously.  If not, a new user ID will be generated and stored
         if mongo.db.threads.find({'_id':ObjectId(id), 'threadUsers.ip':ip_address}).count() == 0:
+            color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
             m = hashlib.md5()
             m.update(str(str(thread['_id']) + ip_address).encode('utf-8'))
             userid = str(m.hexdigest())[0:10]
@@ -193,15 +197,17 @@ def boardT(keyword, id):
             for user in thread['threadUsers']:
                 if user['ip'] == ip_address:
                     userid = user['userID']
+                    color = user['idColor']
 
         # the post and all its corresponding information is posted to the thread
         thread_update = { '$push':
                             { 'thread':
                                 { 'message':request.form['message'], 
-                                'posted':datetime.now(), 
-                                'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
+                                'posted':datetime.now(),
+                                'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
                                 'postNum':new_post_count, 
                                 'user':userid, 
+                                'idColor':color,
                                 'userIP':ip_address, 
                                 'replies':[] 
                                 }
