@@ -75,9 +75,9 @@ div[id^='reply']:target {
 }
 
 #quote {
-    background-color: plum;
-    color: darkred;
-    border-color: plum;
+    background-color: rgb(243, 182, 182);
+    color: black;
+    border-color: rgb(243, 182, 182);
     border: 1px solid;
     border-radius: 2px;
     font-weight: bold;
@@ -85,9 +85,9 @@ div[id^='reply']:target {
 }
 
 #quote:hover {
-    background-color: rgb(90, 10, 114);
+    background-color: darkred;
     color: white;
-    border-color: rgb(90, 10, 114);
+    border-color: white;
     border: 1px solid;
     border-radius: 2px;
     font-weight: bold;
@@ -105,9 +105,9 @@ div[id^='reply']:target {
 }
 
 #reply {
-    background-color: #7DF9FF;
-    color: darkred;
-    border-color: #7DF9FF;
+    background-color: rgb(243, 182, 182);
+    color: black;
+    border-color: rgb(243, 182, 182);
     border: 1px solid;
     border-radius: 2px;
     font-weight: bold;
@@ -115,7 +115,7 @@ div[id^='reply']:target {
 }
 
 #reply:hover {
-    background-color: #00276e;
+    background-color: darkred;
     color: white;
     border-color: white;
     border: 1px solid;
@@ -249,9 +249,9 @@ a#Cancel:active {
 }
 
 a#bottomreply {
-    background-color: #7DF9FF;
-    color: darkred;
-    border-color: #7DF9FF;
+    background-color: rgb(243, 182, 182);
+    color: black;
+    border-color: rgb(243, 182, 182);
     border: 1px solid;
     border-radius: 2px;
     font-weight: bold;
@@ -261,7 +261,7 @@ a#bottomreply {
 }
 
 a#bottomreply:hover {
-    background-color: #00276e;
+    background-color: darkred;
     color: white;
     border-color: white;
     border: 1px solid;
@@ -284,9 +284,9 @@ a#bottomreply:active {
 }
 
 a#topreply {
-    background-color: #7DF9FF;
-    color: darkred;
-    border-color: #7DF9FF;
+    background-color: rgb(243, 182, 182);
+    color: black;
+    border-color: rgb(243, 182, 182);
     border: 1px solid;
     border-radius: 2px;
     font-weight: bold;
@@ -296,7 +296,7 @@ a#topreply {
 }
 
 a#topreply:hover {
-    background-color: rgb(0, 39, 110);
+    background-color: darkred;
     color: rgb(255, 255, 255);
     border-color: rgb(255, 255, 255);
     border: 1px solid;

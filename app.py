@@ -10,14 +10,19 @@ from flask import Flask, render_template, url_for, request, redirect
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
+from dotenv import load_dotenv  #idk how to use this too well yet
 import functools
 import hashlib
 import random
 import re
+import os                       #this was added too and idk what to do with it
+
+# load .env file
+load_dotenv()
 
 app = Flask(__name__, static_folder="./static/")
-app.config['MONGO_DBNAME'] = ''
-app.config["MONGO_URI"] = ''
+app.config['MONGO_DBNAME'] = os.environ.get("MONGO_DBNAME") or os.getenv("MONGO_DBNAME")
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI") or os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
 def __repr__(self):
@@ -104,12 +109,14 @@ def t(id):
         replies = []
 
         for line in message.split('\n'):
-            for word in line.split(' '):
-                if post_link.match(word):
-                    if new_post_count != int(word.replace('[', '').replace(']','')):
-                        for post in thread['thread']:
-                            if post['postNum'] == int(word.replace('[', '').replace(']','')):
-                                replies.append(post['postNum'])
+            if len(line) > 0:
+                if line[0] != '>':
+                    for word in line.split(' '):
+                        if post_link.match(word):
+                            if new_post_count != int(word.replace('[', '').replace(']','')):
+                                for post in thread['thread']:
+                                    if post['postNum'] == int(word.replace('[', '').replace(']','')):
+                                        replies.append(post['postNum'])
 
         for reply in list(set(replies)):
             mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
