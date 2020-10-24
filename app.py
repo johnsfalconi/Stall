@@ -10,12 +10,14 @@ from flask import Flask, render_template, url_for, request, redirect
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
+import functools
 import hashlib
 import random
+import re
 
 app = Flask(__name__, static_folder="./static/")
-app.config['MONGO_DBNAME'] = 'stall'
-app.config["MONGO_URI"] = 'mongodb://stallapp:stall123@cluster0-shard-00-00.bjwrh.mongodb.net:27017,cluster0-shard-00-01.bjwrh.mongodb.net:27017,cluster0-shard-00-02.bjwrh.mongodb.net:27017/stall?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority'
+app.config['MONGO_DBNAME'] = ''
+app.config["MONGO_URI"] = ''
 mongo = PyMongo(app)
 
 def __repr__(self):
@@ -74,10 +76,12 @@ def delete(id):
 def t(id):
     thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
     url = request.url
+    post_link = re.compile(r'^\[[0-9]+\]')
 
     if request.method == 'POST':
         # increment post count for the thread document
         new_post_count = thread['posts'] + 1
+        message = request.form['message']
 
         # getting ip address from the post request
         ip_address = request.remote_addr
@@ -96,10 +100,24 @@ def t(id):
                     userid = user['userID']
                     color = user['idColor']
 
+        # the message is then parsed through to find all the post replies
+        replies = []
+
+        for line in message.split('\n'):
+            for word in line.split(' '):
+                if post_link.match(word):
+                    if new_post_count != int(word.replace('[', '').replace(']','')):
+                        for post in thread['thread']:
+                            if post['postNum'] == int(word.replace('[', '').replace(']','')):
+                                replies.append(post['postNum'])
+
+        for reply in list(set(replies)):
+            mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
+
         # the post and all its corresponding information is posted to the thread
         thread_update = { '$push':
                             { 'thread':
-                                { 'message':request.form['message'], 
+                                { 'message':message, 
                                 'posted':datetime.now(),
                                 'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
                                 'postNum':new_post_count, 
@@ -124,7 +142,7 @@ def t(id):
             return 'thread does not exist'
     else:
         thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
-        return render_template('thread.html', thread = thread)
+        return render_template('thread.html', thread = thread, link = post_link)
 
 
 

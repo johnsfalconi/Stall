@@ -54,7 +54,6 @@ div[id^='reply']:target {
 }
 
 .post {
-    word-break: break-all;
     background: rgb(46, 46, 46);
     border: 1px solid orange;
     border-radius: 7px;
@@ -66,8 +65,6 @@ div[id^='reply']:target {
     width: inherit;
     min-width:inherit;
     max-width:inherit;
-    hyphens:auto;
-    overflow-wrap: break-word;
     text-align: left;
     margin: 0px;
     font-size: smaller;
@@ -78,9 +75,30 @@ div[id^='reply']:target {
 }
 
 #quote {
-    background-color: rgb(182, 231, 66);
+    background-color: plum;
     color: darkred;
-    border-color: rgb(182, 231, 66);
+    border-color: plum;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#quote:hover {
+    background-color: rgb(90, 10, 114);
+    color: white;
+    border-color: rgb(90, 10, 114);
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#quote:active {
+    background-color:orange;
+    color: black;
+    border-color: orange;
+    border: 1px solid;
     border-radius: 2px;
     font-weight: bold;
     text-decoration: none;
@@ -90,6 +108,26 @@ div[id^='reply']:target {
     background-color: #7DF9FF;
     color: darkred;
     border-color: #7DF9FF;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#reply:hover {
+    background-color: #00276e;
+    color: white;
+    border-color: white;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#reply:active {
+    background-color: orange;
+    color: black;
+    border-color: orange;
     border-radius: 2px;
     font-weight: bold;
     text-decoration: none;
@@ -128,4 +166,166 @@ textarea {
     margin:5px;
     border: 1px solid black;
     border-radius: 7px;
+    outline:none;
+}
+
+textarea:focus {
+    outline:none;
+}
+
+input[type=submit] {
+    background-color: lightgreen;
+    border:1px solid;
+    color: darkred;
+    border-color: lightgreen;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: small;
+    text-decoration: none;
+    box-shadow: none;
+    padding:0px;
+    outline:none;
+}
+
+input[type=submit]:hover {
+    background-color: darkgreen;
+    border:1px solid;
+    color: white;
+    border-color: white;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: small;
+    text-decoration: none;
+    box-shadow: none;
+    padding:0px;
+    outline:none;
+}
+
+input[type=submit]:active {
+    background-color: orange;
+    border:1px solid;
+    color: darkred;
+    border-color: orange;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: small;
+    text-decoration: none;
+    box-shadow: none;
+    padding:0px;
+    outline:none;
+}
+
+a#Cancel {
+    background-color: rgb(255, 208, 215);
+    color: darkred;
+    border-color: rgb(255, 208, 215);
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+}
+
+a#Cancel:hover {
+    background-color: darkred;
+    color: white;
+    border-color: white;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+}
+
+a#Cancel:active {
+    background-color: orange;
+    color: darkred;
+    border-color: orange;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+}
+
+a#bottomreply {
+    background-color: #7DF9FF;
+    color: darkred;
+    border-color: #7DF9FF;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+    margin:7px;
+}
+
+a#bottomreply:hover {
+    background-color: #00276e;
+    color: white;
+    border-color: white;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+    margin:7px;
+}
+
+a#bottomreply:active {
+    background-color: orange;
+    color: darkred;
+    border-color: orange;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+}
+
+a#topreply {
+    background-color: #7DF9FF;
+    color: darkred;
+    border-color: #7DF9FF;
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+    margin:7px;
+}
+
+a#topreply:hover {
+    background-color: rgb(0, 39, 110);
+    color: rgb(255, 255, 255);
+    border-color: rgb(255, 255, 255);
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+    margin:7px;
+}
+
+
+a#topreply:active {
+    background-color: rgb(255, 165, 0);
+    color: rgb(139, 0, 0);
+    border-color: rgb(255, 165, 0);
+    border: 1px solid;
+    border-radius: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size:small;
+    margin:7px;
+}
+
+
+a[id^='post'] {
+    text-decoration: none;
+    color:yellow;
+}
+
+a[id^='post']:hover {
+    text-decoration: underline;
 }
