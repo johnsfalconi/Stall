@@ -23,7 +23,7 @@
                     <div class="post_info">
                     UserID: <b style="background-color:{{ post['idColor'] }}; color:darkred; border-radius: 2px;" onmouseenter="this.style.backgroundColor='black'; this.style.color='white'" onmouseleave="this.style.backgroundColor='{{ post['idColor'] }}'; this.style.color='darkred'">{{ post['user'] }}</b> <b>·</b> Posted: <b style='color:darkred;'>{{ post['formattedPosted'] }}</b>
                     </div>
-                    <div class="post">
+                    <div class="post" id = "post{{ post['postNum'] }}">
                         {% if post['postNum'] == 1 %}
                         <div class="title">{{ thread['title'] }}</div>
                         {% else %}

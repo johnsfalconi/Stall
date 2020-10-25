@@ -70,6 +70,26 @@ div[id^='reply']:target {
     font-size: smaller;
 }
 
+div[id^='post']:target  {
+    position:relative;
+    background-color: yellow;
+    border:0px;
+    border-radius: 7px;
+    box-shadow: 3px 3px yellow;
+    padding-top: 20px;
+    padding-left: 0px;
+    padding-right:0px;
+    padding-bottom:0px;
+    width:fit-content;
+    hyphens:auto;
+    overflow-wrap: break-word;
+    min-width:300px;
+    max-width:90vw;
+    margin:15px;
+    margin-left:30px;
+}
+
+
 .quote_reply {
     font-size: xx-small;
 }
