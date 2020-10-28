@@ -12,8 +12,9 @@
         <br>
         <a id="topreply" href="#replyt">[Reply]</a>
         <div class="replybox" id = "replyt">
-            <form actions="/reply/{{ thread['_id'] }}" method="POST">
-                <textarea type = "text" name = "message" id = "message"></textarea><br>
+            <form actions="/reply/{{ thread['_id'] }}" enctype="multipart/form-data" method="POST">
+                <textarea type = "text" name = "message" id = "message" minlength=1 maxlength=1000></textarea><br>
+                <input type="file" id="media" name="media" /><br>
                 <input type = "submit" formaction="/t/{{ thread['_id'] }}" value="[Post]"> <a id="Cancel" href="/t/{{ thread['_id'] }}">[Cancel]</a>
             </form> 
         </div>
@@ -25,8 +26,9 @@
                     </div>
                     <div class="post" id = "post{{ post['postNum'] }}">
                         {% if post['postNum'] == 1 %}
-                        <div class="title">{{ thread['title'] }}</div>
+                        <div class = "media"><img src="{{ post['mediaThumb'] }}"><div class="title">{{ thread['title'] }}</div></div>
                         {% else %}
+                        <div class = "media"><img src="{{ post['mediaThumb'] }}"></div>
                         {% endif %}
                         {% for p in post['message'].split('\n') %}
                         <p style="margin: 0px;">
@@ -51,17 +53,19 @@
                         </p>
                         {% endfor %}
                     <div class="quotebox" id="quote{{ post['postNum'] }}">
-                            <form actions="/reply/{{ thread['_id'] }}" method="POST">
-                                <textarea type = "text" name = "message" id = "message">[{{ post['postNum'] }}]{% for p in post['message'].split('\n') %}
+                            <form actions="/reply/{{ thread['_id'] }}" enctype="multipart/form-data" method="POST">
+                                <textarea type = "text" name = "message" id = "message" minlength=1 maxlength=1000>[{{ post['postNum'] }}]{% for p in post['message'].split('\n') %}
 >{{ p }}{% endfor %}
 </textarea><br>
+                                <input type="file" id="media" name="media" /><br>
                                 <input type = "submit" formaction="/t/{{ thread['_id'] }}" value = "[Post]"> <a id="Cancel" href="/t/{{ thread['_id'] }}">[Cancel]</a>
                             </form>
                     </div>
                     <div class="replybox" id="reply{{ post['postNum'] }}">
-                        <form actions="/reply/{{ thread['_id'] }}" method="POST">
-                            <textarea type = "text" name = "message" id = "message">[{{ post['postNum'] }}]
+                        <form actions="/reply/{{ thread['_id'] }}" enctype="multipart/form-data" method="POST">
+                            <textarea type = "text" name = "message" id = "message" minlength=1 maxlength=1000>[{{ post['postNum'] }}]
 </textarea><br>
+                            <input type="file" id="media" name="media" /><br>
                             <input type = "submit" formaction="/t/{{ thread['_id'] }}" value = "[Post]"> <a id="Cancel" href="/t/{{ thread['_id'] }}">[Cancel]</a>
                         </form>
                     </div>
@@ -73,8 +77,9 @@
             {% endfor %}
         <a id="bottomreply" href="#replyb">[Reply]</a>
         <div class="replybox" id = "replyb">
-            <form actions="/reply/{{ thread['_id'] }}" method="POST">
-                <textarea type = "text" name = "message" id = "message"></textarea><br>
+            <form actions="/reply/{{ thread['_id'] }}" enctype="multipart/form-data" method="POST">
+                <textarea type = "text" name = "message" id = "message" minlength=1 maxlength=1000></textarea><br>
+                <input type="file" id="media" name="media" /><br>
                 <input type = "submit" formaction="/t/{{ thread['_id'] }}" value="[Post]"> <a id="Cancel" href="/t/{{ thread['_id'] }}">[Cancel]</a>
             </form> 
         </div>

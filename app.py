@@ -11,6 +11,9 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
 from dotenv import load_dotenv  #idk how to use this too well yet
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 import functools
 import hashlib
 import random
@@ -25,6 +28,21 @@ app.config['MONGO_DBNAME'] = os.environ.get("MONGO_DBNAME") or os.getenv("MONGO_
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI") or os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
+cloudinary.config(cloud_name = (os.environ.get("CLOUD_NAME") or os.getenv("CLOUD_NAME")), 
+    api_key = (os.environ.get("API_KEY") or os.getenv("API_KEY")), 
+    api_secret = (os.environ.get("API_SECRET") or os.getenv("API_SECRET")))
+
+#### upload ####
+# picture = cloudinary.uploader.upload('C:/PATH/TO/IMAGE/EjB44IfXgAE2kon.jpg')
+
+#### the picture variable is now set up like a dictionary ####
+# picture['secure_url']
+
+#### grabbing the url to manipulate and place in the posts ####
+# pic = cloudinary.CloudinaryImage(picture["public_id"])
+# pic.url
+# pic.url_options.update({"width":200})
+
 def __repr__(self):
     return '<Task %r' % self.id
 
@@ -33,6 +51,22 @@ def __repr__(self):
 def index():
 
     if request.method == 'POST':
+        input_file = request.files["media"]
+
+        if input_file: 
+            content = cloudinary.uploader.upload(input_file)
+            pic = cloudinary.CloudinaryImage(content["public_id"])
+            media = pic.url
+            if int(content["height"]) >= int(content["width"]):
+                pic.url_options.update({"height":400})
+                media_thumb = pic.url
+            else:
+                pic.url_options.update({"width":400})
+                media_thumb = pic.url
+        else:
+           media = ""
+           media_thumb = ""
+
         try:
             # this is all stored as a variable so it can be laid out for readability
             new_thread = {
@@ -45,6 +79,8 @@ def index():
                 'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
                 'thread':[ { 
                     'message':request.form['post'], 
+                    'media':media,
+                    'mediaThumb':media_thumb,
                     'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                     'postNum':1, 
                     'user':'OP', 
@@ -87,6 +123,7 @@ def t(id):
         # increment post count for the thread document
         new_post_count = thread['posts'] + 1
         message = request.form['message']
+        input_file = request.files["media"]
 
         # getting ip address from the post request
         ip_address = request.remote_addr
@@ -121,10 +158,28 @@ def t(id):
         for reply in list(set(replies)):
             mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
 
+        # image files that have been attached
+        if input_file: 
+            content = cloudinary.uploader.upload(input_file)
+            pic = cloudinary.CloudinaryImage(content["public_id"])
+            media = pic.url
+            if int(content["height"]) >= int(content["width"]):
+                pic.url_options.update({"height":200})
+                media_thumb = pic.url
+            else:
+                pic.url_options.update({"width":200})
+                media_thumb = pic.url
+        else:
+           media = ""
+           media_thumb = ""
+
+
         # the post and all its corresponding information is posted to the thread
         thread_update = { '$push':
                             { 'thread':
                                 { 'message':message, 
+                                'media':media,
+                                'mediaThumb':media_thumb,
                                 'posted':datetime.now(),
                                 'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
                                 'postNum':new_post_count, 

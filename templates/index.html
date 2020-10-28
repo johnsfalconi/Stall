@@ -33,9 +33,10 @@
         </table>
         {% endif %}
         <br>
-        <form actions="/" method="POST">
+        <form actions="/" enctype="multipart/form-data" method="POST">
             <label>Subject: </label><input type = "text" name = "title" id = "title"><br>
             <label>Post:    </label><input type = "text" name = "post" id = "post"><br>
+            <input type="file" id="media" name="media" /><br>
             <input type = "submit" value="Add">
         </form> 
     </div>
