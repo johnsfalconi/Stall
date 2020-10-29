@@ -8,7 +8,7 @@
     <div>
 
         <h3>POSTS</h3>
-        <div class='path'><a href = "/">Home</a> > /t/{{ thread['_id'] }}</div>
+        <div class='path'><a href = "/">Home</a> {% if thread['board'] != 'Global' %} > <a href = "/{{ thread['board'] }}">{{ thread['board'] }}</a> {% endif %} > /t/{{ thread['_id'] }}</div>
         <br>
         <a id="topreply" href="#replyt">[Reply]</a>
         <div class="replybox" id = "replyt">
@@ -25,10 +25,11 @@
                     UserID: <b style="background-color:{{ post['idColor'] }}; color:darkred; border-radius: 2px;" onmouseenter="this.style.backgroundColor='black'; this.style.color='white'" onmouseleave="this.style.backgroundColor='{{ post['idColor'] }}'; this.style.color='darkred'">{{ post['user'] }}</b> <b>·</b> Posted: <b style='color:darkred;'>{{ post['formattedPosted'] }}</b>
                     </div>
                     <div class="post" id = "post{{ post['postNum'] }}">
+                        <img src="{{ post['mediaThumb'] }}">
+                        <div id="post-message">
                         {% if post['postNum'] == 1 %}
-                        <div class = "media"><img src="{{ post['mediaThumb'] }}"><div class="title">{{ thread['title'] }}</div></div>
+                        <div class="title">{{ thread['title'] }}</div>
                         {% else %}
-                        <div class = "media"><img src="{{ post['mediaThumb'] }}"></div>
                         {% endif %}
                         {% for p in post['message'].split('\n') %}
                         <p style="margin: 0px;">
@@ -52,6 +53,10 @@
                             {% endif %}
                         </p>
                         {% endfor %}
+                        <br>
+                        <div class="quote_reply"> {{ post['postNum'] }} · <a id="reply" href="#reply{{ post['postNum'] }}">[Reply]</a> · <a id="quote" href="#quote{{ post['postNum'] }}">[Quote]</a> &nbsp 
+                            {% for rp in post['replies'] %} <a id = "postlink{{ rp['reply'] }}" href="#post{{ rp['reply'] }}">[{{ rp['reply'] }}]</a> {% endfor %}</div>
+                        </div>
                     <div class="quotebox" id="quote{{ post['postNum'] }}">
                             <form actions="/reply/{{ thread['_id'] }}" enctype="multipart/form-data" method="POST">
                                 <textarea type = "text" name = "message" id = "message" minlength=1 maxlength=1000>[{{ post['postNum'] }}]{% for p in post['message'].split('\n') %}
@@ -69,9 +74,6 @@
                             <input type = "submit" formaction="/t/{{ thread['_id'] }}" value = "[Post]"> <a id="Cancel" href="/t/{{ thread['_id'] }}">[Cancel]</a>
                         </form>
                     </div>
-                    <br><br>
-                        <div class="quote_reply"> {{ post['postNum'] }} · <a id="reply" href="#reply{{ post['postNum'] }}">[Reply]</a> · <a id="quote" href="#quote{{ post['postNum'] }}">[Quote]</a> &nbsp 
-                            {% for rp in post['replies'] %} <a id = "postlink{{ rp['reply'] }}" href="#post{{ rp['reply'] }}">[{{ rp['reply'] }}]</a> {% endfor %}</div>
                     </div>
                 </div>
             {% endfor %}

@@ -1,404 +1,406 @@
-html, body {
-    width: 100%;
-    height: 100%;
-    background: rgb(0,0,0);
-    width:60vw;
-    scroll-padding: 50px;
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: rgb(0, 0, 0);
+  width: 60vw;
+  scroll-padding: 50px;
 }
 
 .topnav {
-    position:fixed;
-    background-color:rgb(46, 46, 46);
-    top:0px;
-    z-index:9999;
-    width:100vw;
-  }
-  
-  .topnav a {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
-  }
-  
-  .topnav a:hover {
-    background-color: orange;
-    color: black;
-  }
+  position: fixed;
+  background-color: rgb(46, 46, 46);
+  top: 0px;
+  z-index: 9999;
+  width: 100vw;
+}
 
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: orange;
+  color: black;
+}
 
 body {
-    margin: 0;
-    font-family: sans-serif;
-    font: Arial;
-    color: white;
-    width:60vw;
-    line-height:x-small;
+  margin: 0;
+  font-family: sans-serif;
+  font: Arial;
+  color: white;
+  width: 60vw;
+  line-height: x-small;
 }
 
 .path {
-    font-size: small;
+  font-size: small;
 }
 
-div[id^='quote'] {
-    display: none;
+div[id^="quote"] {
+  display: none;
 }
 
-div[id^='quote']:target {
-    display: block;
+div[id^="quote"]:target {
+  display: block;
 }
 
-div[id^='reply'] {
-    display: none;
+div[id^="reply"] {
+  display: none;
 }
 
-div[id^='reply']:target {
-    display: block;
+div[id^="reply"]:target {
+  display: block;
 }
 
 .wrapper {
-    position:relative;
-    background-color: orange;
-    border:0px;
-    border-radius: 7px;
-    box-shadow: 3px 3px orangered;
-    padding-top: 20px;
-    padding-left: 0px;
-    padding-right:0px;
-    padding-bottom:0px;
-    width:fit-content;
-    hyphens:auto;
-    overflow-wrap: break-word;
-    min-width:300px;
-    max-width:90vw;
-    margin:7px;
-    
-}
-
-.media {
-    display:block;
-    float:left;
-}
-
-.media img {
-    float:left;
+  position: relative;
+  background-color: orange;
+  border: 0px;
+  border-radius: 7px;
+  box-shadow: 3px 3px orangered;
+  padding-top: 20px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 1px;
+  width: fit-content;
+  height: fit-content;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  min-width: 300px;
+  max-width: 90vw;
+  margin: 7px;
+  overflow: hidden;
 }
 
 .post {
-    background: rgb(46, 46, 46);
-    border: 1px solid orange;
-    border-radius: 7px;
-    box-shadow: 3px 3px orangered;
-    padding: 5px;
-    padding-top: 5px;
-    padding-left: 5px;
-    padding-right: 40px;
-    width: inherit;
-    min-width:inherit;
-    max-width:inherit;
-    text-align: left;
-    margin: 0px;
-    font-size: smaller;
+  background: rgb(46, 46, 46);
+  border: 1px solid orange;
+  border-radius: 7px;
+  padding: 5px;
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 40px;
+  width: inherit;
+  height: fit-content;
+  min-width: inherit;
+  max-width: inherit;
+  text-align: left;
+  margin: 0px;
+  font-size: smaller;
+  overflow: hidden;
 }
 
-div[id^='post']:target  {
-    position:relative;
-    background-color: yellow;
-    border:0px;
-    border-radius: 7px;
-    box-shadow: 3px 3px yellow;
-    padding-top: 20px;
-    padding-left: 0px;
-    padding-right:0px;
-    padding-bottom:0px;
-    width:fit-content;
-    hyphens:auto;
-    overflow-wrap: break-word;
-    min-width:300px;
-    max-width:90vw;
-    margin:15px;
-    margin-left:30px;
+img {
+  float: left;
+  position: relative;
+  margin: 5px;
 }
 
-
-.quote_reply {
-    font-size: xx-small;
+div[id^="post"]:target {
+  position: relative;
+  background-color: yellow;
+  border: 0px;
+  border-radius: 7px;
+  box-shadow: 3px 3px goldenrod;
+  padding-top: 20px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  min-width: 300px;
+  max-width: 90vw;
+  margin: 15px;
+  margin-left: 30px;
 }
 
 #quote {
-    background-color: rgb(243, 182, 182);
-    color: black;
-    border-color: rgb(243, 182, 182);
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
+  background-color: rgb(243, 182, 182);
+  color: black;
+  border-color: rgb(243, 182, 182);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #quote:hover {
-    background-color: darkred;
-    color: white;
-    border-color: white;
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
+  background-color: darkred;
+  color: white;
+  border-color: white;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #quote:active {
-    background-color:orange;
-    color: black;
-    border-color: orange;
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
+  background-color: orange;
+  color: black;
+  border-color: orange;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #reply {
-    background-color: rgb(243, 182, 182);
-    color: black;
-    border-color: rgb(243, 182, 182);
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
+  background-color: rgb(243, 182, 182);
+  color: black;
+  border-color: rgb(243, 182, 182);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #reply:hover {
-    background-color: darkred;
-    color: white;
-    border-color: white;
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
+  background-color: darkred;
+  color: white;
+  border-color: white;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #reply:active {
-    background-color: orange;
-    color: black;
-    border-color: orange;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
+  background-color: orange;
+  color: black;
+  border-color: orange;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 .post_info {
-    color:black;
-    font-size: small;
-    padding: 3px;
-    position: absolute;
-    top: 0;
-    max-width:90vw;
+  color: black;
+  font-size: small;
+  padding: 3px;
+  position: absolute;
+  top: 0;
+  max-width: 90vw;
 }
 
+hr {
+  color: gray;
+}
+
+.quote_reply {
+  color: white;
+  font-size: xx-small;
+  line-height: 1.5;
+}
 
 .title {
-    font-weight: 1000;
-    color: orange;
-    text-transform: uppercase;
+  font-weight: 1000;
+  color: orange;
+  text-transform: uppercase;
 }
 
 a:link {
-    color:orange;
+  color: orange;
 }
 
 a:visited {
-    color:orange;
+  color: orange;
 }
 
 textarea {
-    font-family: sans-serif;
-    width: 400px;
-    height: 200px;
-    background-color: rgb(66, 66, 66);
-    color:white;
-    margin:5px;
-    margin-bottom: 1px;
-    border: 1px solid black;
-    border-radius: 7px;
-    outline:none;
-    resize: none;
+  font-family: sans-serif;
+  width: 400px;
+  height: 200px;
+  background-color: rgb(66, 66, 66);
+  color: white;
+  margin: 5px;
+  margin-bottom: 1px;
+  border: 1px solid black;
+  border-radius: 7px;
+  outline: none;
+  resize: none;
 }
 
-input[type='file'] {
-    width: 400px;
-    margin: 5px;
-    margin-top: 1px;
-    background-color: BLACK;
-    border:1px dashed;
-    color: orange;
-    border-color: gray;
-    border-radius: 2px;
-    font-weight: bold;
-    font-size: small;
-    text-decoration: none;
-    box-shadow: none;
-    padding:0px;
-    outline:none;
+input[type="file"] {
+  width: 400px;
+  margin: 5px;
+  margin-top: 1px;
+  background-color: BLACK;
+  border: 1px dashed;
+  color: orange;
+  border-color: gray;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: small;
+  text-decoration: none;
+  box-shadow: none;
+  padding: 0px;
+  outline: none;
 }
-
 
 textarea:focus {
-    outline:none;
+  outline: none;
 }
 
-input[type=submit] {
-    background-color: lightgreen;
-    border:1px solid;
-    color: darkred;
-    border-color: lightgreen;
-    border-radius: 2px;
-    font-weight: bold;
-    font-size: small;
-    text-decoration: none;
-    box-shadow: none;
-    padding:0px;
-    outline:none;
+input[type="submit"] {
+  background-color: lightgreen;
+  border: 1px solid;
+  color: darkred;
+  border-color: lightgreen;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: small;
+  text-decoration: none;
+  box-shadow: none;
+  padding: 0px;
+  outline: none;
 }
 
-input[type=submit]:hover {
-    background-color: darkgreen;
-    border:1px solid;
-    color: white;
-    border-color: white;
-    border-radius: 2px;
-    font-weight: bold;
-    font-size: small;
-    text-decoration: none;
-    box-shadow: none;
-    padding:0px;
-    outline:none;
+input[type="submit"]:hover {
+  background-color: darkgreen;
+  border: 1px solid;
+  color: white;
+  border-color: white;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: small;
+  text-decoration: none;
+  box-shadow: none;
+  padding: 0px;
+  outline: none;
 }
 
-input[type=submit]:active {
-    background-color: orange;
-    border:1px solid;
-    color: darkred;
-    border-color: orange;
-    border-radius: 2px;
-    font-weight: bold;
-    font-size: small;
-    text-decoration: none;
-    box-shadow: none;
-    padding:0px;
-    outline:none;
+input[type="submit"]:active {
+  background-color: orange;
+  border: 1px solid;
+  color: darkred;
+  border-color: orange;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: small;
+  text-decoration: none;
+  box-shadow: none;
+  padding: 0px;
+  outline: none;
 }
 
 a#Cancel {
-    background-color: rgb(255, 208, 215);
-    color: darkred;
-    border-color: rgb(255, 208, 215);
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
+  background-color: rgb(255, 208, 215);
+  color: darkred;
+  border-color: rgb(255, 208, 215);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
 }
 
 a#Cancel:hover {
-    background-color: darkred;
-    color: white;
-    border-color: white;
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
+  background-color: darkred;
+  color: white;
+  border-color: white;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
 }
 
 a#Cancel:active {
-    background-color: orange;
-    color: darkred;
-    border-color: orange;
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
+  background-color: orange;
+  color: darkred;
+  border-color: orange;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
 }
 
 a#bottomreply {
-    background-color: rgb(243, 182, 182);
-    color: black;
-    border-color: rgb(243, 182, 182);
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
-    margin:7px;
+  background-color: rgb(243, 182, 182);
+  color: black;
+  border-color: rgb(243, 182, 182);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
+  margin: 7px;
 }
 
 a#bottomreply:hover {
-    background-color: darkred;
-    color: white;
-    border-color: white;
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
-    margin:7px;
+  background-color: darkred;
+  color: white;
+  border-color: white;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
+  margin: 7px;
 }
 
 a#bottomreply:active {
-    background-color: orange;
-    color: darkred;
-    border-color: orange;
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
+  background-color: orange;
+  color: darkred;
+  border-color: orange;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
 }
 
 a#topreply {
-    background-color: rgb(243, 182, 182);
-    color: black;
-    border-color: rgb(243, 182, 182);
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
-    margin:7px;
+  background-color: rgb(243, 182, 182);
+  color: black;
+  border-color: rgb(243, 182, 182);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
+  margin: 7px;
 }
 
 a#topreply:hover {
-    background-color: darkred;
-    color: rgb(255, 255, 255);
-    border-color: rgb(255, 255, 255);
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
-    margin:7px;
+  background-color: darkred;
+  color: rgb(255, 255, 255);
+  border-color: rgb(255, 255, 255);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
+  margin: 7px;
 }
-
 
 a#topreply:active {
-    background-color: rgb(255, 165, 0);
-    color: rgb(139, 0, 0);
-    border-color: rgb(255, 165, 0);
-    border: 1px solid;
-    border-radius: 2px;
-    font-weight: bold;
-    text-decoration: none;
-    font-size:small;
-    margin:7px;
+  background-color: rgb(255, 165, 0);
+  color: rgb(139, 0, 0);
+  border-color: rgb(255, 165, 0);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: small;
+  margin: 7px;
 }
 
-
-a[id^='post'] {
-    text-decoration: none;
-    color:yellow;
+a[id^="post"] {
+  text-decoration: none;
+  color: yellow;
+  background-color: black;
+  border: 1px solid black;
+  border-radius: 2px;
 }
 
-a[id^='post']:hover {
-    text-decoration: underline;
+a[id^="post"]:hover {
+  text-decoration: underline;
 }

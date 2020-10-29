@@ -32,16 +32,6 @@ cloudinary.config(cloud_name = (os.environ.get("CLOUD_NAME") or os.getenv("CLOUD
     api_key = (os.environ.get("API_KEY") or os.getenv("API_KEY")), 
     api_secret = (os.environ.get("API_SECRET") or os.getenv("API_SECRET")))
 
-#### upload ####
-# picture = cloudinary.uploader.upload('C:/PATH/TO/IMAGE/EjB44IfXgAE2kon.jpg')
-
-#### the picture variable is now set up like a dictionary ####
-# picture['secure_url']
-
-#### grabbing the url to manipulate and place in the posts ####
-# pic = cloudinary.CloudinaryImage(picture["public_id"])
-# pic.url
-# pic.url_options.update({"width":200})
 
 def __repr__(self):
     return '<Task %r' % self.id
@@ -211,7 +201,24 @@ def t(id):
 @app.route("/<keyword>/", methods = ['POST', 'GET'])
 def boardIndex(keyword):
     if request.method == 'POST':
+        input_file = request.files["media"]
+
+        if input_file: 
+            content = cloudinary.uploader.upload(input_file)
+            pic = cloudinary.CloudinaryImage(content["public_id"])
+            media = pic.url
+            if int(content["height"]) >= int(content["width"]):
+                pic.url_options.update({"height":400})
+                media_thumb = pic.url
+            else:
+                pic.url_options.update({"width":400})
+                media_thumb = pic.url
+        else:
+            media = ""
+            media_thumb = ""
+
         try:
+            # this is all stored as a variable so it can be laid out for readability
             new_thread = {
                 'title':str(request.form['title']), 
                 'board':keyword, 
@@ -222,6 +229,8 @@ def boardIndex(keyword):
                 'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
                 'thread':[ { 
                     'message':request.form['post'], 
+                    'media':media,
+                    'mediaThumb':media_thumb,
                     'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                     'postNum':1, 
                     'user':'OP', 
@@ -230,17 +239,17 @@ def boardIndex(keyword):
                     'replies':[] 
                 } ]
             }
+            # the actual insert_one statement saved to a variable so the new document's _id can be referenced
             x = mongo.db.threads.insert_one(new_thread)
             
+            #redirect using the thread app route to bring the user to the newly-inserted thread
             return redirect('/' + keyword + '/t/' + str(x.inserted_id))
+
         except:
             return 'There was an issue adding'
     else:
-        if keyword == 't':
-            return 'Invalid board name'
-        else:
-            threads = list(mongo.db.threads.find({'board':keyword}))
-            return render_template('board.html', threads = threads, keyword = keyword)
+        threads = list(mongo.db.threads.find({'board':keyword}))
+        return render_template("index.html", threads = threads, keyword = keyword)
 
 
 @app.route('/<keyword>/delete/<id>')
@@ -257,10 +266,13 @@ def boardDelete(id, keyword):
 def boardT(keyword, id):
     thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
     url = request.url
+    post_link = re.compile(r'^\[[0-9]+\]')
 
     if request.method == 'POST':
         # increment post count for the thread document
         new_post_count = thread['posts'] + 1
+        message = request.form['message']
+        input_file = request.files["media"]
 
         # getting ip address from the post request
         ip_address = request.remote_addr
@@ -271,7 +283,7 @@ def boardT(keyword, id):
             m = hashlib.md5()
             m.update(str(str(thread['_id']) + ip_address).encode('utf-8'))
             userid = str(m.hexdigest())[0:10]
-            mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid}}})
+            mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid, 'idColor':color}}})
         # if the ip address was used before, this next block finds the corresponding user ID so it can be attached to the post
         else:
             for user in thread['threadUsers']:
@@ -279,10 +291,44 @@ def boardT(keyword, id):
                     userid = user['userID']
                     color = user['idColor']
 
+        # the message is then parsed through to find all the post replies
+        replies = []
+
+        for line in message.split('\n'):
+            if len(line) > 0:
+                if line[0] != '>':
+                    for word in line.split(' '):
+                        if post_link.match(word):
+                            if new_post_count != int(word.replace('[', '').replace(']','')):
+                                for post in thread['thread']:
+                                    if post['postNum'] == int(word.replace('[', '').replace(']','')):
+                                        replies.append(post['postNum'])
+
+        for reply in list(set(replies)):
+            mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
+
+        # image files that have been attached
+        if input_file: 
+            content = cloudinary.uploader.upload(input_file)
+            pic = cloudinary.CloudinaryImage(content["public_id"])
+            media = pic.url
+            if int(content["height"]) >= int(content["width"]):
+                pic.url_options.update({"height":200})
+                media_thumb = pic.url
+            else:
+                pic.url_options.update({"width":200})
+                media_thumb = pic.url
+        else:
+           media = ""
+           media_thumb = ""
+
+
         # the post and all its corresponding information is posted to the thread
         thread_update = { '$push':
                             { 'thread':
-                                { 'message':request.form['message'], 
+                                { 'message':message, 
+                                'media':media,
+                                'mediaThumb':media_thumb,
                                 'posted':datetime.now(),
                                 'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
                                 'postNum':new_post_count, 
@@ -302,12 +348,12 @@ def boardT(keyword, id):
         
         # the thread is then refreshed
         try:
-            return redirect(url)
+            return redirect('/t/' + str(thread['_id']))
         except:
             return 'thread does not exist'
     else:
         thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
-        return render_template('thread.html', thread = thread, keyword = keyword)
+        return render_template('thread.html', thread = thread, link = post_link, keyword = keyword)
 
 
 
