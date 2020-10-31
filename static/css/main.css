@@ -78,6 +78,22 @@ div[id^="reply"]:target {
   overflow: hidden;
 }
 
+img[id^="zoom"] {
+  display: none;
+}
+
+img[id^="zoom"]:target {
+  display: block;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  max-width: 80%;
+  max-height: 80%;
+  padding: 100vw;
+  transform: translate(-50%, -50%);
+  z-index: 9998;
+}
+
 .post {
   background: rgb(46, 46, 46);
   border: 1px solid orange;

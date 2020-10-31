@@ -1,16 +1,8 @@
-# since I'm a forgetful freddy, here's the process to push to git and heroku
-    # 1. $ pip freeze > requirements.txt
-    # 2. $ git add .
-    # 3. $ git commit -m "<update summary here>"
-    # 4. $ git remote -v
-    # 5. $ git push heroku master
-
-
 from flask import Flask, render_template, url_for, request, redirect
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
-from dotenv import load_dotenv  #idk how to use this too well yet
+from dotenv import load_dotenv
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -18,7 +10,7 @@ import functools
 import hashlib
 import random
 import re
-import os                       #this was added too and idk what to do with it
+import os
 
 # load .env file
 load_dotenv()

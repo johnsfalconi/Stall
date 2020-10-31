@@ -20,13 +20,17 @@
         </div>
             {% for post in thread['thread'] %}
 
+                <div class="zoom">
+                    <a href="#post{{ post['postNum'] }}"><img id = "zoom{{ post['postNum'] }}" src="{{ post['media'] }}">
+                </div>
+
                 <div class="wrapper" id = "post{{ post['postNum'] }}">
                     <div class="post_info">
                     UserID: <b style="background-color:{{ post['idColor'] }}; color:darkred; border-radius: 2px;" onmouseenter="this.style.backgroundColor='black'; this.style.color='white'" onmouseleave="this.style.backgroundColor='{{ post['idColor'] }}'; this.style.color='darkred'">{{ post['user'] }}</b> <b>·</b> Posted: <b style='color:darkred;'>{{ post['formattedPosted'] }}</b>
                     </div>
-                    <div class="post" id = "post{{ post['postNum'] }}">
-                        <img src="{{ post['mediaThumb'] }}">
-                        <div id="post-message">
+                    <div class="post" id = "post-message{{ post['postNum'] }}">
+                        <a href="#zoom{{ post['postNum'] }}"><img src="{{ post['mediaThumb'] }}"></a>
+                        <div id="post-message" style="padding: 5px; margin-right:10px;">
                         {% if post['postNum'] == 1 %}
                         <div class="title">{{ thread['title'] }}</div>
                         {% else %}
