@@ -3,6 +3,7 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
 from dotenv import load_dotenv
+from thread_functions import no_message, mentions_only, message_spam
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -81,7 +82,7 @@ def index():
             return 'There was an issue adding'
     else:
         threads = list(mongo.db.threads.find({'board':'Global'}))
-        return render_template("index.html", threads = threads)
+        return render_template("index.html", threads = threads, keyword = 'Global')
 
 
 # deleting thread (this should probably only be used for moderators and for the automated system for managing threads)
@@ -109,84 +110,95 @@ def t(id):
 
         # getting ip address from the post request
         ip_address = request.remote_addr
-        
-        # this checks to see if the ip address has posted previously.  If not, a new user ID will be generated and stored
-        if mongo.db.threads.find({'_id':ObjectId(id), 'threadUsers.ip':ip_address}).count() == 0:
-            color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
-            m = hashlib.md5()
-            m.update(str(str(thread['_id']) + ip_address).encode('utf-8'))
-            userid = str(m.hexdigest())[0:10]
-            mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid, 'idColor':color}}})
-        # if the ip address was used before, this next block finds the corresponding user ID so it can be attached to the post
+
+        # spam prevention
+            #   no text or all spaces -> error: post actual text and numbers and stuff, bruh
+            #   the only post are reply links -> error: post actual text and numbers and stuff, bruh... not just mentions...
+            #   the same message from the same person over 3 times -> error: we get it... post something else.
+            #   the same message 6 times in the thread by anyone -> error: we get it... post something else.
+        if no_message(message, post_link, input_file) == True:
+            return render_template('thread.html', thread = thread, link = post_link, error = "error: post actual text and numbers and stuff, bruh")
+        elif message_spam(message, ip_address, thread) == True:
+            return render_template('thread.html', thread = thread, link = post_link, error = "error: we get it... post something else.")
         else:
-            for user in thread['threadUsers']:
-                if user['ip'] == ip_address:
-                    userid = user['userID']
-                    color = user['idColor']
-
-        # the message is then parsed through to find all the post replies
-        replies = []
-
-        for line in message.split('\n'):
-            if len(line) > 0:
-                if line[0] != '>':
-                    for word in line.split(' '):
-                        if post_link.match(word):
-                            if new_post_count != int(word.replace('[', '').replace(']','')):
-                                for post in thread['thread']:
-                                    if post['postNum'] == int(word.replace('[', '').replace(']','')):
-                                        replies.append(post['postNum'])
-
-        for reply in list(set(replies)):
-            mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
-
-        # image files that have been attached
-        if input_file: 
-            content = cloudinary.uploader.upload(input_file)
-            pic = cloudinary.CloudinaryImage(content["public_id"])
-            media = pic.url
-            if int(content["height"]) >= int(content["width"]):
-                pic.url_options.update({"height":200})
-                media_thumb = pic.url
+            
+            # this checks to see if the ip address has posted previously.  If not, a new user ID will be generated and stored
+            if mongo.db.threads.find({'_id':ObjectId(id), 'threadUsers.ip':ip_address}).count() == 0:
+                color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+                m = hashlib.md5()
+                m.update(str(str(thread['_id']) + ip_address).encode('utf-8'))
+                userid = str(m.hexdigest())[0:10]
+                mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid, 'idColor':color}}})
+            # if the ip address was used before, this next block finds the corresponding user ID so it can be attached to the post
             else:
-                pic.url_options.update({"width":200})
-                media_thumb = pic.url
-        else:
-           media = ""
-           media_thumb = ""
+                for user in thread['threadUsers']:
+                    if user['ip'] == ip_address:
+                        userid = user['userID']
+                        color = user['idColor']
+
+            # the message is then parsed through to find all the post replies
+            replies = []
+
+            for line in message.split('\n'):
+                if len(line) > 0:
+                    if line[0] != '>':
+                        for word in line.split(' '):
+                            if post_link.match(word):
+                                if new_post_count != int(word.replace('[', '').replace(']','')):
+                                    for post in thread['thread']:
+                                        if post['postNum'] == int(word.replace('[', '').replace(']','')):
+                                            replies.append(post['postNum'])
+
+            for reply in list(set(replies)):
+                mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
+
+            # image files that have been attached
+            if input_file: 
+                content = cloudinary.uploader.upload(input_file)
+                pic = cloudinary.CloudinaryImage(content["public_id"])
+                media = pic.url
+                if int(content["height"]) >= int(content["width"]):
+                    pic.url_options.update({"height":200})
+                    media_thumb = pic.url
+                else:
+                    pic.url_options.update({"width":200})
+                    media_thumb = pic.url
+            else:
+                media = ""
+                media_thumb = ""
 
 
-        # the post and all its corresponding information is posted to the thread
-        thread_update = { '$push':
-                            { 'thread':
-                                { 'message':message, 
-                                'media':media,
-                                'mediaThumb':media_thumb,
-                                'posted':datetime.now(),
-                                'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
-                                'postNum':new_post_count, 
-                                'user':userid, 
-                                'idColor':color,
-                                'userIP':ip_address, 
-                                'replies':[] 
+            # the post and all its corresponding information is posted to the thread
+            thread_update = { '$push':
+                                { 'thread':
+                                    { 'message':message, 
+                                    'media':media,
+                                    'mediaThumb':media_thumb,
+                                    'posted':datetime.now(),
+                                    'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
+                                    'postNum':new_post_count, 
+                                    'user':userid, 
+                                    'idColor':color,
+                                    'userIP':ip_address, 
+                                    'replies':[] 
+                                    }
+                                }, 
+                                '$set':
+                                    { 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
+                                    'lastUpdated':datetime.now(), 
+                                    'posts':new_post_count
+                                    }
                                 }
-                            }, 
-                            '$set':
-                                { 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
-                                'lastUpdated':datetime.now(), 
-                                'posts':new_post_count
-                                }
-                            }
-        mongo.db.threads.update_one({"_id":ObjectId(id)},thread_update)
-        
-        # the thread is then refreshed
-        try:
-            return redirect('/t/' + str(thread['_id']))
-        except:
-            return 'thread does not exist'
+            mongo.db.threads.update_one({"_id":ObjectId(id)},thread_update)
+            
+            # the thread is then refreshed
+            try:
+                return redirect('/t/' + str(thread['_id']))
+            except:
+                return 'thread does not exist'
     else:
         thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
-        return render_template('thread.html', thread = thread, link = post_link)
+        return render_template('thread.html', thread = thread, link = post_link, error = "none")
 
 
 
@@ -345,7 +357,7 @@ def boardT(keyword, id):
             return 'thread does not exist'
     else:
         thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
-        return render_template('thread.html', thread = thread, link = post_link, keyword = keyword)
+        return render_template('thread.html', thread = thread, link = post_link, keyword = keyword, error = "none")
 
 
 

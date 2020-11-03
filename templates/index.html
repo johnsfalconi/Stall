@@ -5,26 +5,18 @@
 {% endblock %}
 
 {% block body %}
+    <div class='path'><a href = "/">Home</a> {% if keyword != 'Global' %} > <a href = "/{{ keyword }}">{{ keyword }}</a> {% endif %}</div>
+    <br><br>
+
     <div>
-
-        <h3>THREADS</h3>
-        <br><br>
-
         {% if threads|length < 1 %}
         <h4>There are no threads</h4>
         {% else %}
         <table>
-            <tr>
-                <th>POSTED</th>
-                <th>THREAD</th>
-                <th>REPLIES</th>
-                <th>LAST UPDATED</th>
-                <th>ACTIONS</th>
-            </tr>
             {% for thread in threads %}
+                <tr><b>POSTS</b></tr>
                 <tr>
-                    <td>{{ thread['formattedDate'] }}</td>
-                    <td><a href="/t/{{thread['_id']}}">{{ thread['title'] }}</a></td>
+                    <td><a href="/t/{{thread['_id']}}"><b>{{ thread['title'] }}</b></a><br>{{ thread['formattedDate'] }}</td>
                     <td>{{ thread['posts'] }}</td>
                     <td>{{ thread['formattedLastUpdated'] }}</td>
                     <td><a href="/delete/{{thread['_id']}}">Delete</a></td>

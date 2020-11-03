@@ -6,10 +6,12 @@
 
 {% block body %}
     <div>
-
-        <h3>POSTS</h3>
         <div class='path'><a href = "/">Home</a> {% if thread['board'] != 'Global' %} > <a href = "/{{ thread['board'] }}">{{ thread['board'] }}</a> {% endif %} > /t/{{ thread['_id'] }}</div>
         <br>
+        {% if error != 'none' %}
+        <div class = "error">{{ error }}</div>
+        {% else %}
+        {% endif %}
         <a id="topreply" href="#replyt">[Reply]</a>
         <div class="replybox" id = "replyt">
             <form actions="/reply/{{ thread['_id'] }}" enctype="multipart/form-data" method="POST">
