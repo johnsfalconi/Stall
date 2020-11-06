@@ -3,7 +3,7 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
 from dotenv import load_dotenv
-from thread_functions import no_message, mentions_only, message_spam
+from thread_functions import no_message, message_spam, user_spam
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -32,6 +32,15 @@ def __repr__(self):
 # Thread creation and index page generation with the list of threads.
 @app.route("/", methods = ['POST', 'GET'])
 def index():
+    threads = list(mongo.db.threads.find({'board':'Global', 'type':'General'}))
+    stickies = list(mongo.db.threads.find({'board':'Global', 'type':'Sticky'}))
+    dailies = list(mongo.db.threads.find({'board':'Global', 'type':'Daily'}))
+    return render_template("index.html", threads = threads, stickies = stickies, dailies = dailies, keyword = 'Global')
+
+
+# new thread submission
+@app.route("/new/", methods = ['POST', 'GET'])
+def new_thread():
 
     if request.method == 'POST':
         input_file = request.files["media"]
@@ -54,9 +63,11 @@ def index():
             # this is all stored as a variable so it can be laid out for readability
             new_thread = {
                 'title':str(request.form['title']), 
-                'board':'Global', 
+                'board':'Global',
+                'type': 'General', 
                 'formattedDate':str(datetime.now().strftime("%b. %d, %Y")), 
-                'date':datetime.now(),  
+                'date':datetime.now(), 
+                'preview':request.form['post'], 
                 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                 'lastUpdated':datetime.now(), 'posts':1, 
                 'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
@@ -64,7 +75,8 @@ def index():
                     'message':request.form['post'], 
                     'media':media,
                     'mediaThumb':media_thumb,
-                    'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
+                    'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),
+                    'posted': datetime.now(),
                     'postNum':1, 
                     'user':'OP', 
                     'idColor':'#ffffff',
@@ -81,8 +93,7 @@ def index():
         except:
             return 'There was an issue adding'
     else:
-        threads = list(mongo.db.threads.find({'board':'Global'}))
-        return render_template("index.html", threads = threads, keyword = 'Global')
+        return render_template("new_thread.html", keyword = 'Global')
 
 
 # deleting thread (this should probably only be used for moderators and for the automated system for managing threads)
@@ -116,10 +127,14 @@ def t(id):
             #   the only post are reply links -> error: post actual text and numbers and stuff, bruh... not just mentions...
             #   the same message from the same person over 3 times -> error: we get it... post something else.
             #   the same message 6 times in the thread by anyone -> error: we get it... post something else.
+        time_diff = user_spam(ip_address, thread)
+
         if no_message(message, post_link, input_file) == True:
             return render_template('thread.html', thread = thread, link = post_link, error = "error: post actual text and numbers and stuff, bruh")
         elif message_spam(message, ip_address, thread) == True:
             return render_template('thread.html', thread = thread, link = post_link, error = "error: we get it... post something else.")
+        elif time_diff <= 45:
+            return render_template('thread.html', thread = thread, link = post_link, error = "error: slooowwwwww doooowwwwwnnnnn (wait like " + str(45 - time_diff) + " more seconds)")
         else:
             
             # this checks to see if the ip address has posted previously.  If not, a new user ID will be generated and stored

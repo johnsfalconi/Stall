@@ -25,6 +25,58 @@ body {
   font-size: 13px;
 }
 
+table {
+  margin: 5px;
+  margin-top: 1px;
+  background-color: black;
+  border: 1px solid orange;
+  border-collapse: collapse;
+  min-width: 70vw;
+  max-width: 90vw;
+}
+
+th {
+  font-size: small;
+  color: white;
+  background-color: black;
+  border-radius: 3px;
+}
+
+td {
+  text-align: left;
+  font-size: medium;
+  margin-top: 2px;
+  border: 1px solid gray;
+  height: 30px;
+  overflow: hidden;
+}
+
+td.preview {
+  text-align: left;
+  font-size: small;
+  background-color: rgb(46, 46, 46);
+}
+
+tr.threads:hover {
+  background-color: rgb(255, 165, 0, 0.2);
+}
+
+tr.dailies:hover {
+  background-color: rgb(154, 205, 50, 0.2);
+}
+
+tr.stickies:hover {
+  background-color: rgb(255, 255, 0, 0.2);
+}
+
+tr[id^="t"] {
+  visibility: collapse;
+}
+
+tr[id^="t"]:target {
+  visibility: visible;
+}
+
 .topnav a:hover {
   background-color: orange;
   border-radius: 3px;
@@ -43,6 +95,15 @@ body {
 
 .path {
   font-size: small;
+}
+
+.error {
+  font-size: medium;
+  color: red;
+  font-weight: bold;
+  font-style: italic;
+  /* background-color: white; */
+  border-radius: 3px;
 }
 
 div[id^="quote"] {
@@ -67,6 +128,46 @@ div[id^="reply"]:target {
   border: 0px;
   border-radius: 7px;
   box-shadow: 3px 3px orangered;
+  padding-top: 20px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 1px;
+  width: fit-content;
+  height: fit-content;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  min-width: 300px;
+  max-width: 90vw;
+  margin: 7px;
+  overflow: hidden;
+}
+
+.sticky-wrapper {
+  position: relative;
+  background-color: yellow;
+  border: 0px;
+  border-radius: 7px;
+  box-shadow: 3px 3px goldenrod;
+  padding-top: 20px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 1px;
+  width: fit-content;
+  height: fit-content;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  min-width: 300px;
+  max-width: 90vw;
+  margin: 7px;
+  overflow: hidden;
+}
+
+.daily-wrapper {
+  position: relative;
+  background-color: greenyellow;
+  border: 0px;
+  border-radius: 7px;
+  box-shadow: 3px 3px green;
   padding-top: 20px;
   padding-left: 0px;
   padding-right: 0px;

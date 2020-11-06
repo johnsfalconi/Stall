@@ -9,28 +9,57 @@
     <br><br>
 
     <div>
-        {% if threads|length < 1 %}
-        <h4>There are no threads</h4>
-        {% else %}
+        <div class="sticky-wrapper">
+        <div class="post_info"><b style="font-weight:1000;">STICKIED</b></div>
         <table>
-            {% for thread in threads %}
-                <tr><b>POSTS</b></tr>
-                <tr>
-                    <td><a href="/t/{{thread['_id']}}"><b>{{ thread['title'] }}</b></a><br>{{ thread['formattedDate'] }}</td>
-                    <td>{{ thread['posts'] }}</td>
-                    <td>{{ thread['formattedLastUpdated'] }}</td>
-                    <td><a href="/delete/{{thread['_id']}}">Delete</a></td>
-                </tr>
-            {% endfor %}
-        </table>
+        {% if stickies|length < 1 %}
+        <tr class="stickies"><td>There are no stickies</td></tr>
+        {% else %}
+                {% for sticky in stickies %}
+                    <tr class="stickies">
+                        <td onclick="location.href='/t/{{thread['_id']}}'"><a style="display:inline-block; margin-bottom:2px;" href="/t/{{thread['_id']}}"><b>{{ thread['title'] }}</b></a><p style="font-size:small; margin-top:0px; margin-bottom:0px;">Posted on {{ thread['formattedDate'] }} · {% if thread['posts'] == 1 %} {{ thread['posts'] }} post {% else %} {{ thread['posts'] }} posts {% endif %}</p><p style="font-size:small; margin-top:0px; margin-bottom:2px;">Last updated: {{ thread['formattedLastUpdated'] }}</p></td>
+                    </tr>
+                {% endfor %}
         {% endif %}
-        <br>
-        <form actions="/" enctype="multipart/form-data" method="POST">
-            <label>Subject: </label><input type = "text" name = "title" id = "title"><br>
-            <label>Post:    </label><input type = "text" name = "post" id = "post"><br>
-            <input type="file" id="media" name="media" /><br>
-            <input type = "submit" value="Add">
-        </form> 
+    </table>
     </div>
+    </div>
+
+    <div>
+        <div class="daily-wrapper">
+            <div class="post_info"><b style="font-weight:1000;">DAILIES</b></div>
+            <table>
+                {% if dailies|length < 1 %}
+                <tr class="dailies"><td>There are no dailies</td></tr>
+                {% else %}
+                    {% for daily in dailies %}
+                        <tr class="dailies">
+                            <td onclick="location.href='/t/{{thread['_id']}}'"><a style="display:inline-block; margin-bottom:2px;" href="/t/{{thread['_id']}}"><b>{{ thread['title'] }}</b></a><p style="font-size:small; margin-top:0px; margin-bottom:0px;">Posted on {{ thread['formattedDate'] }} · {% if thread['posts'] == 1 %} {{ thread['posts'] }} post {% else %} {{ thread['posts'] }} posts {% endif %}</p><p style="font-size:small; margin-top:0px; margin-bottom:2px;">Last updated: {{ thread['formattedLastUpdated'] }}</p></td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+    <br>
+
+    <a href="/new/">New Thread</a>
+    <div>
+        <div class="wrapper">
+            <div class="post_info"><b style="font-weight:1000;">THREADS</b></div>
+            <table>
+                {% if threads|length < 1 %}
+                <tr class="threads"><td>There are no threads</td></tr>
+                {% else %}
+                    {% for thread in threads %}
+                        <tr class="threads">
+                            <td onclick="location.href='/t/{{thread['_id']}}'"><a style="display:inline-block; margin-bottom:2px;" href="/t/{{thread['_id']}}"><b>{{ thread['title'] }}</b></a><p style="font-size:small; margin-top:0px; margin-bottom:0px;">Posted on {{ thread['formattedDate'] }} · {% if thread['posts'] == 1 %} {{ thread['posts'] }} post {% else %} {{ thread['posts'] }} posts {% endif %}</p><p style="font-size:small; margin-top:0px; margin-bottom:2px;">Last updated: {{ thread['formattedLastUpdated'] }}</p></td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+        <br>
     
 {% endblock %}

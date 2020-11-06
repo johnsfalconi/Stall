@@ -9,7 +9,7 @@
         <div class='path'><a href = "/">Home</a> {% if thread['board'] != 'Global' %} > <a href = "/{{ thread['board'] }}">{{ thread['board'] }}</a> {% endif %} > /t/{{ thread['_id'] }}</div>
         <br>
         {% if error != 'none' %}
-        <div class = "error">{{ error }}</div>
+        <div class = "error">{{ error }}</div><br>
         {% else %}
         {% endif %}
         <a id="topreply" href="#replyt">[Reply]</a>
