@@ -11,9 +11,15 @@
     <body>
         <div class="topnav">
             <a href="/">Home</a>
-            <a href="">Boards</a>
-            <a href="">Archives</a>
-            <a href="" style="float:right; margin-right: 20px;">Sign In</a>
+            <a href="/boards/">Boards</a>
+            <a href="/archives/">Archives</a>
+            {% if current_user.is_authenticated %}
+            <a href="/users/">Users</a>
+            <div class = 'username'>
+                <a href="/users/{{ current_user.username }}">{{ current_user.username }}</a>
+                <a href="/logout/" style="margin-right: 20px;">Sign Out</a>
+            </div>
+            {% else%}<a href="/login/" style="float:right; margin-right: 20px;">Sign In</a>{% endif %}
         </div>
 
         {% block body %}{% endblock %}

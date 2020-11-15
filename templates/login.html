@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+    <div class='path'><a href = "/">Home</a> > <a href = "/login/">Sign In</a></div>
+    <br><br>
+
+    <div>
+        <div class="wrapper">
+            <form actions="/user_login/" class="login" method="POST" style="text-align:center;">
+                <b style="font-weight:1000; color: black; font-size: small;">USERNAME:</b> <br>
+                <input type = "text" maxlength="100" name = "username" id = "username"><br><br>
+                <b style="font-weight:1000; color: black; font-size: small;">PASSWORD:</b> <br>
+                <input type = "password" name = "password" id = "password"><br><br>
+                <input type = "submit" value="Sign In">
+            </form> 
+        </div>
+        <br>
+        <div style="font-size:small;">Don't have an account? <a href = "/register/">Register</a></div>
+    </div>
+    
+{% endblock %}

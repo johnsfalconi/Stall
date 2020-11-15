@@ -13,7 +13,7 @@
         <div class="post_info"><b style="font-weight:1000;">STICKIED</b></div>
         <table>
         {% if stickies|length < 1 %}
-        <tr class="stickies"><td>There are no stickies</td></tr>
+        <tr class="stickies"><td>Not Implemented Yet</td></tr>
         {% else %}
                 {% for sticky in stickies %}
                     <tr class="stickies">
@@ -30,11 +30,11 @@
             <div class="post_info"><b style="font-weight:1000;">DAILIES</b></div>
             <table>
                 {% if dailies|length < 1 %}
-                <tr class="dailies"><td>There are no dailies</td></tr>
+                <tr class="dailies"><td>Not Implemented Yet</td></tr>
                 {% else %}
                     {% for daily in dailies %}
                         <tr class="dailies">
-                            <td onclick="location.href='/t/{{thread['_id']}}'"><a style="display:inline-block; margin-bottom:2px;" href="/t/{{thread['_id']}}"><b>{{ thread['title'] }}</b></a><p style="font-size:small; margin-top:0px; margin-bottom:0px;">Posted on {{ thread['formattedDate'] }} · {% if thread['posts'] == 1 %} {{ thread['posts'] }} post {% else %} {{ thread['posts'] }} posts {% endif %}</p><p style="font-size:small; margin-top:0px; margin-bottom:2px;">Last updated: {{ thread['formattedLastUpdated'] }}</p></td>
+                            <td onclick="location.href='/t/{{thread['_id']}}'"><a style="display:inline-block; margin-bottom:2px;" href="/t/{{thread['_id']}}"><b>{{ daily['title'] }}</b></a><p style="font-size:small; margin-top:0px; margin-bottom:0px;">Posted on {{ daily['formattedDate'] }} · {% if daily['posts'] == 1 %} {{ daily['posts'] }} post {% else %} {{ daily['posts'] }} posts {% endif %}</p><p style="font-size:small; margin-top:0px; margin-bottom:2px;">Last updated: {{ daily['formattedLastUpdated'] }}</p></td>
                         </tr>
                     {% endfor %}
                 {% endif %}
@@ -43,7 +43,7 @@
     </div>
     <br>
 
-    <a href="/new/">New Thread</a>
+    <a href="/new/" style="font-size: small;">New Thread</a>
     <div>
         <div class="wrapper">
             <div class="post_info"><b style="font-weight:1000;">THREADS</b></div>
@@ -60,6 +60,7 @@
             </table>
         </div>
     </div>
+    <a href="/new/" style="font-size: small;">New Thread</a>
         <br>
     
 {% endblock %}

@@ -1,9 +1,12 @@
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, session
 from flask_pymongo import PyMongo
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from bson.objectid import ObjectId
 from datetime import datetime
 from dotenv import load_dotenv
+from passlib.hash import sha256_crypt
 from thread_functions import no_message, message_spam, user_spam
+from user_functions import username_error, password_error
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -18,8 +21,13 @@ load_dotenv()
 
 app = Flask(__name__, static_folder="./static/")
 app.config['MONGO_DBNAME'] = os.environ.get("MONGO_DBNAME") or os.getenv("MONGO_DBNAME")
-app.config["MONGO_URI"] = os.environ.get("MONGO_URI") or os.getenv("MONGO_URI")
+app.config['MONGO_URI'] = os.environ.get("MONGO_URI") or os.getenv("MONGO_URI")
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY") or os.getenv("SECRET_KEY")
 mongo = PyMongo(app)
+
+login = LoginManager()
+login.init_app(app)
+login.login_view = 'login'
 
 cloudinary.config(cloud_name = (os.environ.get("CLOUD_NAME") or os.getenv("CLOUD_NAME")), 
     api_key = (os.environ.get("API_KEY") or os.getenv("API_KEY")), 
@@ -29,13 +37,16 @@ cloudinary.config(cloud_name = (os.environ.get("CLOUD_NAME") or os.getenv("CLOUD
 def __repr__(self):
     return '<Task %r' % self.id
 
+
 # Thread creation and index page generation with the list of threads.
 @app.route("/", methods = ['POST', 'GET'])
 def index():
+
     threads = list(mongo.db.threads.find({'board':'Global', 'type':'General'}))
     stickies = list(mongo.db.threads.find({'board':'Global', 'type':'Sticky'}))
     dailies = list(mongo.db.threads.find({'board':'Global', 'type':'Daily'}))
     return render_template("index.html", threads = threads, stickies = stickies, dailies = dailies, keyword = 'Global')
+    
 
 
 # new thread submission
@@ -152,6 +163,7 @@ def t(id):
                         color = user['idColor']
 
             # the message is then parsed through to find all the post replies
+                # should probably update this to a separate function
             replies = []
 
             for line in message.split('\n'):
@@ -217,164 +229,270 @@ def t(id):
 
 
 
-@app.route("/<keyword>/", methods = ['POST', 'GET'])
-def boardIndex(keyword):
-    if request.method == 'POST':
-        input_file = request.files["media"]
+# @app.route("/<keyword>/", methods = ['POST', 'GET'])
+# def boardIndex(keyword):
+#     if request.method == 'POST':
+#         input_file = request.files["media"]
 
-        if input_file: 
-            content = cloudinary.uploader.upload(input_file)
-            pic = cloudinary.CloudinaryImage(content["public_id"])
-            media = pic.url
-            if int(content["height"]) >= int(content["width"]):
-                pic.url_options.update({"height":400})
-                media_thumb = pic.url
-            else:
-                pic.url_options.update({"width":400})
-                media_thumb = pic.url
-        else:
-            media = ""
-            media_thumb = ""
+#         if input_file: 
+#             content = cloudinary.uploader.upload(input_file)
+#             pic = cloudinary.CloudinaryImage(content["public_id"])
+#             media = pic.url
+#             if int(content["height"]) >= int(content["width"]):
+#                 pic.url_options.update({"height":400})
+#                 media_thumb = pic.url
+#             else:
+#                 pic.url_options.update({"width":400})
+#                 media_thumb = pic.url
+#         else:
+#             media = ""
+#             media_thumb = ""
 
-        try:
-            # this is all stored as a variable so it can be laid out for readability
-            new_thread = {
-                'title':str(request.form['title']), 
-                'board':keyword, 
-                'formattedDate':str(datetime.now().strftime("%b. %d, %Y")), 
-                'date':datetime.now(),  
-                'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
-                'lastUpdated':datetime.now(), 'posts':1, 
-                'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
-                'thread':[ { 
-                    'message':request.form['post'], 
-                    'media':media,
-                    'mediaThumb':media_thumb,
-                    'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
-                    'postNum':1, 
-                    'user':'OP', 
-                    'idColor':'#ffffff',
-                    'userIP':request.remote_addr, 
-                    'replies':[] 
-                } ]
-            }
-            # the actual insert_one statement saved to a variable so the new document's _id can be referenced
-            x = mongo.db.threads.insert_one(new_thread)
+#         try:
+#             # this is all stored as a variable so it can be laid out for readability
+#             new_thread = {
+#                 'title':str(request.form['title']), 
+#                 'board':keyword, 
+#                 'formattedDate':str(datetime.now().strftime("%b. %d, %Y")), 
+#                 'date':datetime.now(),  
+#                 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
+#                 'lastUpdated':datetime.now(), 'posts':1, 
+#                 'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
+#                 'thread':[ { 
+#                     'message':request.form['post'], 
+#                     'media':media,
+#                     'mediaThumb':media_thumb,
+#                     'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
+#                     'postNum':1, 
+#                     'user':'OP', 
+#                     'idColor':'#ffffff',
+#                     'userIP':request.remote_addr, 
+#                     'replies':[] 
+#                 } ]
+#             }
+#             # the actual insert_one statement saved to a variable so the new document's _id can be referenced
+#             x = mongo.db.threads.insert_one(new_thread)
             
-            #redirect using the thread app route to bring the user to the newly-inserted thread
-            return redirect('/' + keyword + '/t/' + str(x.inserted_id))
+#             #redirect using the thread app route to bring the user to the newly-inserted thread
+#             return redirect('/' + keyword + '/t/' + str(x.inserted_id))
 
-        except:
-            return 'There was an issue adding'
-    else:
-        threads = list(mongo.db.threads.find({'board':keyword}))
-        return render_template("index.html", threads = threads, keyword = keyword)
-
-
-@app.route('/<keyword>/delete/<id>')
-def boardDelete(id, keyword):
-    try:
-        mongo.db.threads.delete_one({"_id":ObjectId(id)})
-        return redirect('/' + keyword + '/')
-    except:
-        return 'there was a problem deleting'
+#         except:
+#             return 'There was an issue adding'
+#     else:
+#         threads = list(mongo.db.threads.find({'board':keyword}))
+#         return render_template("index.html", threads = threads, keyword = keyword)
 
 
+# @app.route('/<keyword>/delete/<id>')
+# def boardDelete(id, keyword):
+#     try:
+#         mongo.db.threads.delete_one({"_id":ObjectId(id)})
+#         return redirect('/' + keyword + '/')
+#     except:
+#         return 'there was a problem deleting'
 
-@app.route('/<keyword>/t/<id>', methods = ['GET', 'POST'])
-def boardT(keyword, id):
-    thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
-    url = request.url
-    post_link = re.compile(r'^\[[0-9]+\]')
 
-    if request.method == 'POST':
-        # increment post count for the thread document
-        new_post_count = thread['posts'] + 1
-        message = request.form['message']
-        input_file = request.files["media"]
 
-        # getting ip address from the post request
-        ip_address = request.remote_addr
+# @app.route('/<keyword>/t/<id>', methods = ['GET', 'POST'])
+# def boardT(keyword, id):
+#     thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
+#     url = request.url
+#     post_link = re.compile(r'^\[[0-9]+\]')
+
+#     if request.method == 'POST':
+#         # increment post count for the thread document
+#         new_post_count = thread['posts'] + 1
+#         message = request.form['message']
+#         input_file = request.files["media"]
+
+#         # getting ip address from the post request
+#         ip_address = request.remote_addr
         
-        # this checks to see if the ip address has posted previously.  If not, a new user ID will be generated and stored
-        if mongo.db.threads.find({'_id':ObjectId(id), 'threadUsers.ip':ip_address}).count() == 0:
-            color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
-            m = hashlib.md5()
-            m.update(str(str(thread['_id']) + ip_address).encode('utf-8'))
-            userid = str(m.hexdigest())[0:10]
-            mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid, 'idColor':color}}})
-        # if the ip address was used before, this next block finds the corresponding user ID so it can be attached to the post
-        else:
-            for user in thread['threadUsers']:
-                if user['ip'] == ip_address:
-                    userid = user['userID']
-                    color = user['idColor']
+#         # this checks to see if the ip address has posted previously.  If not, a new user ID will be generated and stored
+#         if mongo.db.threads.find({'_id':ObjectId(id), 'threadUsers.ip':ip_address}).count() == 0:
+#             color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+#             m = hashlib.md5()
+#             m.update(str(str(thread['_id']) + ip_address).encode('utf-8'))
+#             userid = str(m.hexdigest())[0:10]
+#             mongo.db.threads.update_one({'_id':ObjectId(id)},{'$push':{'threadUsers':{'ip':ip_address, 'userID':userid, 'idColor':color}}})
+#         # if the ip address was used before, this next block finds the corresponding user ID so it can be attached to the post
+#         else:
+#             for user in thread['threadUsers']:
+#                 if user['ip'] == ip_address:
+#                     userid = user['userID']
+#                     color = user['idColor']
 
-        # the message is then parsed through to find all the post replies
-        replies = []
+#         # the message is then parsed through to find all the post replies
+#         replies = []
 
-        for line in message.split('\n'):
-            if len(line) > 0:
-                if line[0] != '>':
-                    for word in line.split(' '):
-                        if post_link.match(word):
-                            if new_post_count != int(word.replace('[', '').replace(']','')):
-                                for post in thread['thread']:
-                                    if post['postNum'] == int(word.replace('[', '').replace(']','')):
-                                        replies.append(post['postNum'])
+#         for line in message.split('\n'):
+#             if len(line) > 0:
+#                 if line[0] != '>':
+#                     for word in line.split(' '):
+#                         if post_link.match(word):
+#                             if new_post_count != int(word.replace('[', '').replace(']','')):
+#                                 for post in thread['thread']:
+#                                     if post['postNum'] == int(word.replace('[', '').replace(']','')):
+#                                         replies.append(post['postNum'])
 
-        for reply in list(set(replies)):
-            mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
+#         for reply in list(set(replies)):
+#             mongo.db.threads.update_one({"_id":ObjectId(id), "thread":{ "$elemMatch": {"postNum":reply}}},{ '$push':{ "thread.$.replies": {'reply':new_post_count }}})
 
-        # image files that have been attached
-        if input_file: 
-            content = cloudinary.uploader.upload(input_file)
-            pic = cloudinary.CloudinaryImage(content["public_id"])
-            media = pic.url
-            if int(content["height"]) >= int(content["width"]):
-                pic.url_options.update({"height":200})
-                media_thumb = pic.url
+#         # image files that have been attached
+#         if input_file: 
+#             content = cloudinary.uploader.upload(input_file)
+#             pic = cloudinary.CloudinaryImage(content["public_id"])
+#             media = pic.url
+#             if int(content["height"]) >= int(content["width"]):
+#                 pic.url_options.update({"height":200})
+#                 media_thumb = pic.url
+#             else:
+#                 pic.url_options.update({"width":200})
+#                 media_thumb = pic.url
+#         else:
+#            media = ""
+#            media_thumb = ""
+
+
+#         # the post and all its corresponding information is posted to the thread
+#         thread_update = { '$push':
+#                             { 'thread':
+#                                 { 'message':message, 
+#                                 'media':media,
+#                                 'mediaThumb':media_thumb,
+#                                 'posted':datetime.now(),
+#                                 'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
+#                                 'postNum':new_post_count, 
+#                                 'user':userid, 
+#                                 'idColor':color,
+#                                 'userIP':ip_address, 
+#                                 'replies':[] 
+#                                 }
+#                             }, 
+#                             '$set':
+#                                 { 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
+#                                 'lastUpdated':datetime.now(), 
+#                                 'posts':new_post_count
+#                                 }
+#                             }
+#         mongo.db.threads.update_one({"_id":ObjectId(id)},thread_update)
+        
+#         # the thread is then refreshed
+#         try:
+#             return redirect('/t/' + str(thread['_id']))
+#         except:
+#             return 'thread does not exist'
+#     else:
+#         thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
+#         return render_template('thread.html', thread = thread, link = post_link, keyword = keyword, error = "none")
+
+
+@app.route('/boards/', methods = ['GET', 'POST'])
+def boards():
+    return render_template('boards.html', keyword = "Global")
+
+
+@app.route('/archives/', methods = ['GET', 'POST'])
+def archives():
+    return render_template('archives.html', keyword = "Global")
+
+
+class User:
+    def __init__(self, username):
+        self.username = username
+
+    @staticmethod
+    def is_authenticated():
+        return True
+
+    @staticmethod
+    def is_active():
+        return True
+
+    @staticmethod
+    def is_anonymous():
+        return False
+
+    def get_id(self):
+        return self.username
+
+    @staticmethod
+    def check_password(password_hash, password):
+        return check_password_hash(password_hash, password)
+
+
+    @login.user_loader
+    def load_user(username):
+        u = mongo.db.users.find_one({"username": username})
+        if not u:
+            return None
+        return User(username=u['username'])
+
+    @app.route('/login/', methods=['GET', 'POST'])
+    def login():
+        if current_user.is_authenticated:
+            return redirect(url_for('index'))
+        if request.method == 'POST':
+            user = mongo.db.users.find_one({"username": request.form['username']})
+            if user and sha256_crypt.verify(request.form['password'], user['password']):
+                user_obj = User(username=user['username'])
+                login_user(user_obj)
+                return redirect('/')
             else:
-                pic.url_options.update({"width":200})
-                media_thumb = pic.url
+                return render_template('login.html', keyword = "Global")
+        return render_template('login.html', keyword = "Global")
+
+    @app.route('/logout/')
+    def logout():
+        logout_user()
+        return redirect('/')
+
+
+@app.route('/register/', methods = ['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password1 = request.form['password']
+        password2 = request.form['password2']
+
+        u_error = username_error(username)
+        p_error = password_error(password1, password2)
+
+        user_list = list(mongo.db.users.find({'username':username}))
+        if len(user_list) > 0:
+            u_error2 = 'Username already exists.'
         else:
-           media = ""
-           media_thumb = ""
+            u_error2 = False
 
+        if u_error != False:
+            return render_template('register.html', error = u_error, keyword = "Global")
+        if u_error2 != False:
+            return render_template('register.html', error = u_error2, keyword = "Global")
+        elif p_error != False:
+            return render_template('register.html', error = p_error, keyword = "Global")
+        else:
+            pass_hash = sha256_crypt.encrypt(password1)
+            new_user = {
+                'username':username, 
+                'password':pass_hash,
+                'formattedDate':str(datetime.now().strftime("%b. %d, %Y")), 
+                'date':datetime.now()
+            }
+            mongo.db.users.insert_one(new_user)
+            user_obj = User(username=username)
+            login_user(user_obj)
+            return redirect('/')
 
-        # the post and all its corresponding information is posted to the thread
-        thread_update = { '$push':
-                            { 'thread':
-                                { 'message':message, 
-                                'media':media,
-                                'mediaThumb':media_thumb,
-                                'posted':datetime.now(),
-                                'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),  
-                                'postNum':new_post_count, 
-                                'user':userid, 
-                                'idColor':color,
-                                'userIP':ip_address, 
-                                'replies':[] 
-                                }
-                            }, 
-                            '$set':
-                                { 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
-                                'lastUpdated':datetime.now(), 
-                                'posts':new_post_count
-                                }
-                            }
-        mongo.db.threads.update_one({"_id":ObjectId(id)},thread_update)
-        
-        # the thread is then refreshed
-        try:
-            return redirect('/t/' + str(thread['_id']))
-        except:
-            return 'thread does not exist'
     else:
-        thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
-        return render_template('thread.html', thread = thread, link = post_link, keyword = keyword, error = "none")
+        return render_template('register.html', error = 'none', keyword = "Global")
 
+@app.route('/users/<username>', methods = ['GET', 'POST'])
+def profile(username):
+    return render_template('profile.html', username = username)
 
+@app.route('/users/', methods = ['GET', 'POST'])
+def users():
+    return render_template('users.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

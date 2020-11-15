@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+    <div class='path'><a href = "/">Home</a> > <a href = "/register/">Register</a></div>
+    <br><br>
+    {% if error != 'none' %}<div class = "error">{{ error }}</div> {% else %}{% endif %}
+    <div>
+        <div class="wrapper">
+            <form actions="/register/" class="login" method="POST" style="text-align:center;">
+                <b style="font-weight:1000; color: black; font-size: small;">USERNAME:</b> <br>
+                <input type = "text" maxlength="100" name = "username" id = "username"><br><br>
+                <b style="font-weight:1000; color: black; font-size: small;">PASSWORD:</b> <br>
+                <input type = "password" name = "password" id = "password"><br><br>
+                <b style="font-weight:1000; color: black; font-size: small;">VERIFY PASSWORD:</b> <br>
+                <input type = "password" name = "password2" id = "password2"><br><br>
+                <input type = "submit" value="Register">
+            </form> 
+        </div>
+        <br>
+        <div style="font-size:small;">Already have an account? <a href = "/login/">Sign In</a></div>
+    </div>
+    
+{% endblock %}

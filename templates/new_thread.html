@@ -11,8 +11,8 @@
     <div>
         <div class="wrapper">
         <div class="post_info"><b style="font-weight:1000;">NEW THREAD</b></div>
-            <form actions="/" enctype="multipart/form-data" method="POST">
-                <input type = "text" name = "title" id = "title"><br>
+            <form actions="/new/" enctype="multipart/form-data" method="POST">
+                <input type = "text" maxlength="100" name = "title" id = "title"><br>
                 <textarea name = "post" id = "post"></textarea><br>
                 <input type="file" id="media" name="media" /><br>
                 <input type = "submit" value="Add">

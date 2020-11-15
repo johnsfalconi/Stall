@@ -25,6 +25,11 @@ body {
   font-size: 13px;
 }
 
+.username {
+  display: inline-block;
+  float: right;
+}
+
 table {
   margin: 5px;
   margin-top: 1px;
@@ -332,6 +337,19 @@ a:visited {
   color: orange;
 }
 
+input[id="title"] {
+  width: 400px;
+  background-color: rgb(66, 66, 66);
+  margin: 5px;
+  margin-bottom: 1px;
+  border: 1px solid black;
+  border-radius: 7px;
+}
+
+input[id="title"]:focus {
+  outline: none;
+}
+
 textarea {
   font-family: sans-serif;
   width: 400px;
@@ -379,6 +397,8 @@ input[type="submit"] {
   box-shadow: none;
   padding: 0px;
   outline: none;
+  margin: 5px;
+  margin-top: 1px;
 }
 
 input[type="submit"]:hover {
@@ -523,4 +543,22 @@ a[id^="post"] {
 
 a[id^="post"]:hover {
   text-decoration: underline;
+}
+
+input[id="username"] {
+  width: 200px;
+  background-color: rgb(66, 66, 66);
+  margin: 5px;
+  margin-bottom: 1px;
+  border: 1px solid black;
+  border-radius: 7px;
+}
+
+input[id^="password"] {
+  width: 200px;
+  background-color: rgb(66, 66, 66);
+  margin: 5px;
+  margin-bottom: 1px;
+  border: 1px solid black;
+  border-radius: 7px;
 }
