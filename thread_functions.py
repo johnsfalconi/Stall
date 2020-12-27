@@ -1,6 +1,7 @@
 from datetime import datetime
 import re
 import time
+import emojis
 
 # first check is if there is nothing in the post.  Can't post an empty post
     # "error: post actual text and numbers and stuff, bruh..."
@@ -62,3 +63,17 @@ def user_spam(ip_address, thread):
     
     diff = round(time_now - last_post.timestamp())
     return diff
+
+
+# returns a specific field from nested documents
+def nested_return(thread, nested_field, id_field, id, return_field):
+    for x in thread[nested_field]:
+        if x[id_field] == id:
+            return x[return_field]
+
+# encodes message with any and all emojis
+def emoji_check(message):
+    message = emojis.encode(message)
+
+    # will add more to this later to check for custom board-specific emotes
+    return message

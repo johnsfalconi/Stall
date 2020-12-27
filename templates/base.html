@@ -16,7 +16,7 @@
             {% if current_user.is_authenticated %}
             <a href="/users/">Users</a>
             <div class = 'username'>
-                <a href="/users/{{ current_user.username }}">{{ current_user.username }}</a>
+                <a href="/users/{{ current_user.username }}">{{ current_user.username }} [{{ current_user.type }}]</a>
                 <a href="/logout/" style="margin-right: 20px;">Sign Out</a>
             </div>
             {% else%}<a href="/login/" style="float:right; margin-right: 20px;">Sign In</a>{% endif %}

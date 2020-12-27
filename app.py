@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from datetime import datetime
 from dotenv import load_dotenv
 from passlib.hash import sha256_crypt
-from thread_functions import no_message, message_spam, user_spam
+from thread_functions import no_message, message_spam, user_spam, emoji_check, nested_return
 from user_functions import username_error, password_error
 import cloudinary
 import cloudinary.uploader
@@ -45,9 +45,26 @@ def index():
     threads = list(mongo.db.threads.find({'board':'Global', 'type':'General'}))
     stickies = list(mongo.db.threads.find({'board':'Global', 'type':'Sticky'}))
     dailies = list(mongo.db.threads.find({'board':'Global', 'type':'Daily'}))
-    return render_template("index.html", threads = threads, stickies = stickies, dailies = dailies, keyword = 'Global')
+    board = list(mongo.db.boards.find({'board':'Global'}))
+    mods = board[0]['moderators']
+    return render_template("index.html", threads = threads, stickies = stickies, dailies = dailies, keyword = 'Global', mods = mods)
     
 
+@app.route("/sticky/<id>", methods = ['POST', 'GET'])
+def sticky(id):
+    try:
+        mongo.db.threads.update_one({'_id':ObjectId(id)},{'$set':{'type':'Sticky'}})
+        return redirect('/')
+    except:
+        return 'there was a problem stickying'
+
+@app.route("/unsticky/<id>", methods = ['POST', 'GET'])
+def unsticky(id):
+    try:
+        mongo.db.threads.update_one({'_id':ObjectId(id)},{'$set':{'type':'General'}})
+        return redirect('/')
+    except:
+        return 'there was a problem un-stickying'
 
 # new thread submission
 @app.route("/new/", methods = ['POST', 'GET'])
@@ -70,6 +87,8 @@ def new_thread():
            media = ""
            media_thumb = ""
 
+        message = emoji_check(request.form['post'])
+
         try:
             # this is all stored as a variable so it can be laid out for readability
             new_thread = {
@@ -78,12 +97,12 @@ def new_thread():
                 'type': 'General', 
                 'formattedDate':str(datetime.now().strftime("%b. %d, %Y")), 
                 'date':datetime.now(), 
-                'preview':request.form['post'], 
+                'preview':message, 
                 'formattedLastUpdated':datetime.now().strftime("%b. %d, %Y %I:%M%p"), 
                 'lastUpdated':datetime.now(), 'posts':1, 
                 'threadUsers':[ { 'ip':request.remote_addr, 'userID':'OP', 'idColor':'#ffffff'  } ],
                 'thread':[ { 
-                    'message':request.form['post'], 
+                    'message':message, 
                     'media':media,
                     'mediaThumb':media_thumb,
                     'formattedPosted':datetime.now().strftime("%b. %d, %Y %I:%M%p"),
@@ -123,11 +142,12 @@ def t(id):
     thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
     url = request.url
     post_link = re.compile(r'^\[[0-9]+\]')
+    cust_moji = re.compile(r'^\:[A-Za-z0-9_-]\:')
 
     if request.method == 'POST':
         # increment post count for the thread document
         new_post_count = thread['posts'] + 1
-        message = request.form['message']
+        message = emoji_check(request.form['message'])
         input_file = request.files["media"]
 
         # getting ip address from the post request
@@ -224,8 +244,10 @@ def t(id):
             except:
                 return 'thread does not exist'
     else:
+        board = list(mongo.db.boards.find({'board':'Global'}))
+        mods = board[0]['moderators']
         thread = mongo.db.threads.find_one_or_404({'_id':ObjectId(id)})
-        return render_template('thread.html', thread = thread, link = post_link, error = "none")
+        return render_template('thread.html', thread = thread, link = post_link, error = "none", mods = mods, nested_return = nested_return)
 
 
 
@@ -398,8 +420,9 @@ def archives():
 
 
 class User:
-    def __init__(self, username):
+    def __init__(self, username, ty):
         self.username = username
+        self.type = ty
 
     @staticmethod
     def is_authenticated():
@@ -426,7 +449,7 @@ class User:
         u = mongo.db.users.find_one({"username": username})
         if not u:
             return None
-        return User(username=u['username'])
+        return User(username=u['username'], ty = u['type'])
 
     @app.route('/login/', methods=['GET', 'POST'])
     def login():
@@ -435,7 +458,7 @@ class User:
         if request.method == 'POST':
             user = mongo.db.users.find_one({"username": request.form['username']})
             if user and sha256_crypt.verify(request.form['password'], user['password']):
-                user_obj = User(username=user['username'])
+                user_obj = User(username=user['username'], ty=user['type'])
                 login_user(user_obj)
                 return redirect('/')
             else:
@@ -476,10 +499,11 @@ def register():
                 'username':username, 
                 'password':pass_hash,
                 'formattedDate':str(datetime.now().strftime("%b. %d, %Y")), 
-                'date':datetime.now()
+                'date':datetime.now(),
+                'type':'User'
             }
             mongo.db.users.insert_one(new_user)
-            user_obj = User(username=username)
+            user_obj = User(username=username, ty = 'User')
             login_user(user_obj)
             return redirect('/')
 
@@ -496,3 +520,4 @@ def users():
 
 if __name__ == "__main__":
     app.run(debug=True)
+

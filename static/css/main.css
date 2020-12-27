@@ -275,6 +275,36 @@ div[id^="post"]:target {
   text-decoration: none;
 }
 
+#remove {
+  background-color: rgb(243, 182, 182);
+  color: black;
+  border-color: rgb(243, 182, 182);
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#remove:hover {
+  background-color: darkred;
+  color: white;
+  border-color: white;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#remove:active {
+  background-color: orange;
+  color: black;
+  border-color: orange;
+  border: 1px solid;
+  border-radius: 2px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
 #reply {
   background-color: rgb(243, 182, 182);
   color: black;
@@ -561,4 +591,8 @@ input[id^="password"] {
   margin-bottom: 1px;
   border: 1px solid black;
   border-radius: 7px;
+}
+
+.stickylink {
+  color: yellow;
 }

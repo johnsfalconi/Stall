@@ -38,10 +38,10 @@
                         {% else %}
                         {% endif %}
                         {% for p in post['message'].split('\n') %}
-                        <p style="margin: 0px;">
                             {% if p[0] == '>' %}
                                 <p style = "margin:0; color:lawngreen">{{ p }}
                             {% else %}
+                            <p style = "margin:0;">
                                 {% for word in p.split() %}
                                     {% if link.match(word) %}
                                         <a id = "postlink{{ word.replace('[','').replace(']','') }}" href="#post{{ word.replace('[','').replace(']','') }}">{{ word }}</a>
@@ -57,10 +57,10 @@
                                     {% endif %}
                                 {% endfor %}    
                             {% endif %}
-                        </p>
+                            </p>
                         {% endfor %}
                         <br>
-                        <div class="quote_reply"> {{ post['postNum'] }} · <a id="reply" href="#reply{{ post['postNum'] }}">[Reply]</a> · <a id="quote" href="#quote{{ post['postNum'] }}">[Quote]</a> &nbsp 
+                        <div class="quote_reply"> {{ post['postNum'] }} · <a id="reply" href="#reply{{ post['postNum'] }}">[Reply]</a> · <a id="quote" href="#quote{{ post['postNum'] }}">[Quote]</a> {% if current_user.username in mods%} · <a id="remove" href="">[Remove]</a> {% else %}{% endif %} &nbsp 
                             {% for rp in post['replies'] %} <a id = "postlink{{ rp['reply'] }}" href="#post{{ rp['reply'] }}">[{{ rp['reply'] }}]</a> {% endfor %}</div>
                         </div>
                     <div class="quotebox" id="quote{{ post['postNum'] }}">
