@@ -56,12 +56,13 @@ def message_spam(msg, ip_address, thread):
 # checks for user posting too quickly
 def user_spam(ip_address, thread):
     time_now = time.time()
+    last_post = 0.0
     
     for post in thread['thread']:
         if ip_address == post['userIP']:
             last_post = post['posted']
     
-    diff = round(time_now - last_post.timestamp())
+    diff = round(time_now - last_post)
     return diff
 
 
